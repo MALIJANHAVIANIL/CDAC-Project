@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { login, register } from '../services/authService';
 
 const Auth: React.FC = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+
     const [isLogin, setIsLogin] = useState(true);
-    const [selectedRole, setSelectedRole] = useState('student');
+    const [selectedRole, setSelectedRole] = useState('STUDENT');
     const [showPassword, setShowPassword] = useState(false);
+
+    // Form State
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        branch: '',
+        cgpa: ''
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (location.state?.mode === 'register') {
@@ -17,10 +31,10 @@ const Auth: React.FC = () => {
     }, [location.state]);
 
     const roles = [
-        { id: 'student', label: 'Student' },
-        { id: 'tpo', label: 'TPO Admin' },
-        { id: 'alumni', label: 'Alumni' },
-        { id: 'hr', label: 'HR' }
+        { id: 'STUDENT', label: 'Student' },
+        { id: 'TPO', label: 'TPO Admin' },
+        { id: 'ALUMNI', label: 'Alumni' },
+        { id: 'HR', label: 'HR' }
     ];
 
     const benefits = [
@@ -29,6 +43,35 @@ const Auth: React.FC = () => {
         { icon: '📈', title: 'Skill Recovery' },
         { icon: '📊', title: 'Real-time Analytics' }
     ];
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        try {
+            if (isLogin) {
+                await login({ email: formData.email, password: formData.password });
+                navigate('/dashboard');
+            } else {
+                await register({
+                    ...formData,
+                    role: selectedRole,
+                    cgpa: formData.cgpa ? parseFloat(formData.cgpa) : null
+                });
+                setIsLogin(true); // Switch to login after successful register
+                setError('Registration successful! Please login.');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Authentication failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     return (
         <div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center p-6 relative overflow-hidden">
@@ -109,6 +152,13 @@ const Auth: React.FC = () => {
                         </button>
                     </div>
 
+                    {/* Error/Success Msg */}
+                    {error && (
+                        <div className={`p-4 rounded-xl mb-6 text-sm font-bold text-center ${error.includes('successful') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {error}
+                        </div>
+                    )}
+
                     {/* Form Container */}
                     <AnimatePresence mode="wait">
                         <motion.form
@@ -117,23 +167,41 @@ const Auth: React.FC = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                             className="space-y-6"
+                            onSubmit={handleSubmit}
                         >
                             {!isLogin && (
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">Full Name</label>
-                                    <input type="text" placeholder="John Doe" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
-                                </div>
+                                <>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">Full Name</label>
+                                        <input name="name" type="text" value={formData.name} onChange={handleInputChange} placeholder="John Doe" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
+                                    </div>
+                                    {selectedRole === 'STUDENT' && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">Branch</label>
+                                                <input name="branch" type="text" value={formData.branch} onChange={handleInputChange} placeholder="IT/CS" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">CGPA</label>
+                                                <input name="cgpa" type="number" step="0.01" value={formData.cgpa} onChange={handleInputChange} placeholder="9.0" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
 
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">Email Address</label>
-                                <input type="email" placeholder="name@example.com" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
+                                <input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="name@example.com" className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10" required />
                             </div>
 
                             <div className="space-y-1 relative">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-1">Password</label>
                                 <input
+                                    name="password"
                                     type={showPassword ? 'text' : 'password'}
+                                    value={formData.password}
+                                    onChange={handleInputChange}
                                     placeholder="••••••••"
                                     className="w-full py-4 px-6 bg-white/5 border-b-2 border-white/10 rounded-t-2xl outline-none focus:border-purple-500 transition-all focus:bg-white/10"
                                     required
@@ -147,33 +215,13 @@ const Auth: React.FC = () => {
                                 </button>
                             </div>
 
-                            {isLogin && (
-                                <div className="text-right">
-                                    <a href="#" className="text-sm font-bold text-purple-400 hover:text-purple-300 transition-colors">Forgot Password?</a>
-                                </div>
-                            )}
-
-                            <button className="w-full py-5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-white shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all mt-4 uppercase tracking-wider">
-                                {isLogin ? 'Sign In' : 'Create Account'}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-white shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all mt-4 uppercase tracking-wider ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
                             </button>
-
-                            <div className="relative py-4 flex items-center gap-4">
-                                <div className="flex-1 h-[1px] bg-white/10"></div>
-                                <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">or continue with</span>
-                                <div className="flex-1 h-[1px] bg-white/10"></div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                {['🔵', '⚫', '🔴'].map((social, i) => (
-                                    <button
-                                        key={i}
-                                        type="button"
-                                        className="flex-1 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-purple-500/50 transition-all text-xl"
-                                    >
-                                        {social}
-                                    </button>
-                                ))}
-                            </div>
                         </motion.form>
                     </AnimatePresence>
                 </motion.div>
