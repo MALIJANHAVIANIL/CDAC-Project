@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElevateConnect - Alumni Directory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        /* Background Mesh Gradient */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 20% 30%, rgba(88, 28, 135, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(29, 78, 216, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            background-color: #0a0a0f;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent);
+            top: 10%;
+            left: 10%;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4), transparent);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 7s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3), transparent);
+            top: 50%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            height: 100%;
+            min-height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            position: fixed;
+            height: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .page-title-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #0a0a0f;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px 8px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Search Toolbar */
+        .search-toolbar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            padding: 12px 40px 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' opacity='0.6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            min-width: 140px;
+        }
+
+        .filter-select:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.7);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .filter-select option {
+            background: #1a1a24;
+            color: #ffffff;
+            padding: 12px;
+        }
+
+        .results-count {
+            padding: 12px 20px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #8b5cf6;
+            white-space: nowrap;
+        }
+
+        /* Alumni Grid */
+        .alumni-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            perspective: 1000px;
+        }
+
+        /* Alumni Card */
+        .alumni-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .alumni-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .alumni-card:hover {
+            transform: translateY(-12px) rotateX(5deg) rotateY(-5deg);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 30px 80px rgba(139, 92, 246, 0.4), 
+                        0 0 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .alumni-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            padding: 32px 28px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .alumni-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
+                        0 0 40px rgba(139, 92, 246, 0.2);
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .alumni-card:hover .alumni-avatar {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), 
+                        0 0 60px rgba(139, 92, 246, 0.4);
+            transform: scale(1.05);
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #0a0a0f;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .status-indicator.available {
+            background: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-indicator.busy {
+            background: #6b7280;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+                transform: scale(1.1);
+            }
+        }
+
+        .card-body {
+            padding: 0 28px 24px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .alumni-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .alumni-role {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 6px;
+        }
+
+        .alumni-company {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag.dept {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        .card-footer {
+            padding: 0 28px 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .view-profile-btn {
+            width: 100%;
+            padding: 16px 28px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border: none;
+            border-radius: 16px;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3), 
+                        inset 0 2px 8px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .view-profile-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .view-profile-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 48px rgba(139, 92, 246, 0.5), 
+                        inset 0 2px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .view-profile-btn:hover::before {
+            left: 100%;
+        }
+
+        .view-profile-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            display: none;
+        }
+
+        .empty-state.show {
+            display: block;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            color: rgba(139, 92, 246, 0.3);
+            margin-bottom: 24px;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Loading Animation */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading-card {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                padding: 24px 12px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 16px;
+            }
+
+            .alumni-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px;
+            }
+
+            .top-bar {
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .search-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-container {
+                min-width: 100%;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .results-count {
+                text-align: center;
+            }
+
+            .alumni-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .alumni-card:hover {
+                transform: translateY(-8px);
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="bg-gradient">
+   <div class="blob blob-1"></div>
+   <div class="blob blob-2"></div>
+   <div class="blob blob-3"></div>
+  </div>
+  <div class="dashboard"><!-- Sidebar -->
+   <aside class="sidebar">
+    <div class="logo"><i class="fas fa-graduation-cap"></i> <span>ElevateConnect</span>
+    </div>
+    <nav class="nav-items"><a href="#" class="nav-item"> <i class="fas fa-th-large"></i> <span>Dashboard</span> </a> <a href="#" class="nav-item"> <i class="fas fa-briefcase"></i> <span>Drives</span> </a> <a href="#" class="nav-item"> <i class="fas fa-file-alt"></i> <span>Applications</span> </a> <a href="#" class="nav-item"> <i class="fas fa-certificate"></i> <span>Certifications</span> </a> <a href="#" class="nav-item active"> <i class="fas fa-users"></i> <span>Alumni Network</span> </a> <a href="#" class="nav-item"> <i class="fas fa-user-circle"></i> <span>Profile</span> </a> <a href="#" class="nav-item"> <i class="fas fa-cog"></i> <span>Settings</span> </a>
+    </nav>
+   </aside><!-- Main Content -->
+   <main class="main-content"><!-- Top Bar -->
+    <header class="top-bar">
+     <div class="page-title-section">
+      <h1 class="page-title">Alumni Directory</h1>
+      <p class="page-subtitle">Connect with mentors and explore career paths</p>
+     </div>
+     <div class="top-bar-actions">
+      <div class="notification-btn"><i class="fas fa-bell"></i>
+       <div class="notification-badge"></div>
+      </div>
+      <div class="user-profile">
+       <div class="user-avatar">
+        R
+       </div>
+       <div class="user-info">
+        <div class="user-name">
+         Rahul Kumar
+        </div>
+        <div class="user-role">
+         Student
+        </div>
+       </div>
+      </div>
+     </div>
+    </header><!-- Content Area -->
+    <div class="content-area"><!-- Search Toolbar -->
+     <div class="search-toolbar">
+      <div class="search-container"><i class="fas fa-search search-icon"></i> <input type="text" class="search-input" id="searchInput" placeholder="Search by name, company, or role...">
+      </div>
+      <div class="filter-group"><label class="filter-label">Batch:</label> <select class="filter-select" id="batchFilter"> <option value="all">All Batches</option> <option value="2024">2024</option> <option value="2023">2023</option> <option value="2022">2022</option> <option value="2021">2021</option> <option value="2020">2020</option> </select>
+      </div>
+      <div class="filter-group"><label class="filter-label">Dept:</label> <select class="filter-select" id="deptFilter"> <option value="all">All Departments</option> <option value="CS">Computer Science</option> <option value="IT">Information Tech</option> <option value="Mech">Mechanical</option> <option value="ECE">Electronics</option> <option value="Civil">Civil</option> </select>
+      </div>
+      <div class="results-count" id="resultsCount">
+       8 Alumni
+      </div>
+     </div><!-- Alumni Grid -->
+     <div class="alumni-grid" id="alumniGrid"><!-- Alumni cards will be dynamically inserted here -->
+     </div><!-- Empty State -->
+     <div class="empty-state" id="emptyState">
+      <div class="empty-icon"><i class="fas fa-user-slash"></i>
+      </div>
+      <h3 class="empty-title">No Alumni Found</h3>
+      <p class="empty-description">Try adjusting your search or filter criteria to find more alumni.</p>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+        // ============= MOCK DATA =============
+        
+        const alumniData = [
+            {
+                id: 1001,
+                name: 'Priya Sharma',
+                role: 'SDE II',
+                company: 'Microsoft',
+                batch: '2022',
+                dept: 'CS',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=5'
+            },
+            {
+                id: 1002,
+                name: 'Arjun Mehta',
+                role: 'Senior Software Engineer',
+                company: 'Google',
+                batch: '2021',
+                dept: 'IT',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=12'
+            },
+            {
+                id: 1003,
+                name: 'Sneha Patel',
+                role: 'Product Manager',
+                company: 'Amazon',
+                batch: '2023',
+                dept: 'CS',
+                isMentorAvailable: false,
+                image: 'https://i.pravatar.cc/200?img=9'
+            },
+            {
+                id: 1004,
+                name: 'Vikram Singh',
+                role: 'Data Scientist',
+                company: 'Meta',
+                batch: '2020',
+                dept: 'IT',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=14'
+            },
+            {
+                id: 1005,
+                name: 'Ananya Reddy',
+                role: 'Tech Lead',
+                company: 'Netflix',
+                batch: '2021',
+                dept: 'CS',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=10'
+            },
+            {
+                id: 1006,
+                name: 'Rajesh Kumar',
+                role: 'Mechanical Engineer',
+                company: 'Tesla',
+                batch: '2022',
+                dept: 'Mech',
+                isMentorAvailable: false,
+                image: 'https://i.pravatar.cc/200?img=15'
+            },
+            {
+                id: 1007,
+                name: 'Kavya Iyer',
+                role: 'Full Stack Developer',
+                company: 'Stripe',
+                batch: '2023',
+                dept: 'IT',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=16'
+            },
+            {
+                id: 1008,
+                name: 'Aditya Gupta',
+                role: 'DevOps Engineer',
+                company: 'Adobe',
+                batch: '2024',
+                dept: 'CS',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=13'
+            },
+            {
+                id: 1009,
+                name: 'Meera Nair',
+                role: 'Hardware Engineer',
+                company: 'Intel',
+                batch: '2020',
+                dept: 'ECE',
+                isMentorAvailable: false,
+                image: 'https://i.pravatar.cc/200?img=24'
+            },
+            {
+                id: 1010,
+                name: 'Rohan Das',
+                role: 'Civil Engineer',
+                company: 'L&T',
+                batch: '2021',
+                dept: 'Civil',
+                isMentorAvailable: true,
+                image: 'https://i.pravatar.cc/200?img=33'
+            }
+        ];
+
+        let filteredAlumni = [...alumniData];
+
+        // ============= RENDERING FUNCTIONS =============
+
+        function renderAlumniCards(alumni) {
+            const grid = document.getElementById('alumniGrid');
+            const emptyState = document.getElementById('emptyState');
+            const resultsCount = document.getElementById('resultsCount');
+
+            if (alumni.length === 0) {
+                grid.style.display = 'none';
+                emptyState.classList.add('show');
+                resultsCount.textContent = '0 Alumni';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.classList.remove('show');
+            resultsCount.textContent = `${alumni.length} Alumni`;
+
+            grid.innerHTML = alumni.map(alumnus => `
+                <div class="alumni-card">
+                    <div class="card-header">
+                        <div class="avatar-container">
+                            <img 
+                                src="${alumnus.image}" 
+                                alt="${alumnus.name}" 
+                                class="alumni-avatar"
+                                onerror="this.src=''; this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;alumni-avatar&quot; style=&quot;background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800;&quot;>${alumnus.name.charAt(0)}</div><div class=&quot;status-indicator ${alumnus.isMentorAvailable ? 'available' : 'busy'}&quot;></div>';"
+                            >
+                            <div class="status-indicator ${alumnus.isMentorAvailable ? 'available' : 'busy'}"></div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="alumni-name">${alumnus.name}</h3>
+                        <div class="alumni-role">${alumnus.role}</div>
+                        <div class="alumni-company">at ${alumnus.company}</div>
+                        <div class="tags-container">
+                            <span class="tag">Batch ${alumnus.batch}</span>
+                            <span class="tag dept">${alumnus.dept}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="alumni-profile.html?id=${alumnus.id}" class="view-profile-btn">
+                            <span>View Profile</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============= FILTERING LOGIC =============
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const batchFilter = document.getElementById('batchFilter').value;
+            const deptFilter = document.getElementById('deptFilter').value;
+
+            filteredAlumni = alumniData.filter(alumnus => {
+                const matchesSearch = 
+                    alumnus.name.toLowerCase().includes(searchTerm) ||
+                    alumnus.role.toLowerCase().includes(searchTerm) ||
+                    alumnus.company.toLowerCase().includes(searchTerm);
+
+                const matchesBatch = batchFilter === 'all' || alumnus.batch === batchFilter;
+                const matchesDept = deptFilter === 'all' || alumnus.dept === deptFilter;
+
+                return matchesSearch && matchesBatch && matchesDept;
+            });
+
+            renderAlumniCards(filteredAlumni);
+        }
+
+        // ============= EVENT LISTENERS =============
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('batchFilter').addEventListener('change', applyFilters);
+        document.getElementById('deptFilter').addEventListener('change', applyFilters);
+
+        // ============= MOUSE PARALLAX =============
+
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            const blobs = document.querySelectorAll('.blob');
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 10;
+                blob.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px)`;
+            });
+        });
+
+        // ============= 3D TILT EFFECT =============
+
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.alumni-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+
+                if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+                    card.style.transform = `translateY(-12px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                }
+            });
+        });
+
+        document.addEventListener('mouseleave', () => {
+            const cards = document.querySelectorAll('.alumni-card');
+            cards.forEach(card => {
+                card.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // ============= INITIALIZATION =============
+
+        window.addEventListener('load', () => {
+            renderAlumniCards(alumniData);
+            console.log('Alumni Directory Page Loaded with', alumniData.length, 'alumni');
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a337f61055946ef',t:'MTc2MzkzMDU5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

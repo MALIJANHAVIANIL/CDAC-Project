@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElevateConnect - Drive Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        /* Background Mesh Gradient */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 20% 30%, rgba(88, 28, 135, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(29, 78, 216, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            background-color: #0a0a0f;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            transition: transform 0.3s ease-out;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent);
+            top: 10%;
+            left: 10%;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4), transparent);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 7s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3), transparent);
+            top: 50%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            height: 100%;
+            min-height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            position: fixed;
+            height: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px 8px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Action Bar / Toolbar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 4px 24px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+        }
+
+        .filter-select {
+            padding: 14px 40px 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' opacity='0.4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .filter-select:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .filter-select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+
+        .add-drive-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border: none;
+            border-radius: 14px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-drive-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .add-drive-btn:hover::before {
+            left: 100%;
+        }
+
+        .add-drive-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
+        }
+
+        .add-drive-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Glass Shell Container */
+        .glass-shell {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass Data Grid */
+        .data-grid {
+            width: 100%;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1.5fr 1fr 1.8fr 1.2fr 1fr;
+            gap: 20px;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 12px;
+        }
+
+        .grid-header-cell {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .grid-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1.5fr 1fr 1.8fr 1.2fr 1fr;
+            gap: 20px;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            align-items: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInRow 0.5s ease forwards;
+        }
+
+        @keyframes fadeInRow {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .grid-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 24px rgba(139, 92, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .grid-cell {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .company-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .company-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.ongoing {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .status-badge.upcoming {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .status-badge.completed {
+            background: rgba(107, 114, 128, 0.15);
+            color: #9ca3af;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-icon:hover {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            transform: scale(1.1);
+        }
+
+        .action-icon.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-card {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.4s ease;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dept-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-color: #8b5cf6;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .grid-header,
+            .grid-row {
+                grid-template-columns: 1.5fr 1.5fr 1.2fr 0.8fr 1.5fr 1fr 0.8fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                padding: 24px 12px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .logo {
+                font-size: 20px;
+                justify-content: center;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 16px;
+            }
+
+            .grid-header,
+            .grid-row {
+                font-size: 12px;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .glass-shell {
+                padding: 20px;
+                overflow-x: auto;
+            }
+
+            .data-grid {
+                min-width: 900px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="bg-gradient">
+   <div class="blob blob-1"></div>
+   <div class="blob blob-2"></div>
+   <div class="blob blob-3"></div>
+  </div>
+  <div class="dashboard"><!-- Sidebar -->
+   <aside class="sidebar">
+    <div class="logo"><i class="fas fa-graduation-cap"></i> <span>ElevateConnect</span>
+    </div>
+    <nav class="nav-items">
+     <div class="nav-item"><i class="fas fa-th-large"></i> <span>Dashboard</span>
+     </div>
+     <div class="nav-item active"><i class="fas fa-briefcase"></i> <span>Drives</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-users"></i> <span>Students</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-chart-line"></i> <span>Analytics</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-cog"></i> <span>Settings</span>
+     </div>
+    </nav>
+   </aside><!-- Main Content -->
+   <main class="main-content"><!-- Top Bar -->
+    <header class="top-bar">
+     <h1 class="page-title">Drive Management</h1>
+     <div class="user-profile">
+      <div class="user-avatar">
+       T
+      </div>
+      <div class="user-info">
+       <div class="user-name">
+        TPO Admin
+       </div>
+       <div class="user-role">
+        Placement Officer
+       </div>
+      </div>
+     </div>
+    </header><!-- Content Area -->
+    <div class="content-area"><!-- Action Bar -->
+     <div class="action-bar">
+      <div class="search-container"><i class="fas fa-search search-icon"></i> <input type="text" class="search-input" id="searchInput" placeholder="Search by company, role, or department...">
+      </div><select class="filter-select" id="filterSelect"> <option value="all">All Status</option> <option value="upcoming">Upcoming</option> <option value="ongoing">Ongoing</option> <option value="completed">Completed</option> </select> <button class="add-drive-btn" id="addDriveBtn"> <i class="fas fa-plus-circle"></i> Add New Drive </button>
+     </div><!-- Glass Shell with Data Grid -->
+     <div class="glass-shell">
+      <div class="data-grid">
+       <div class="grid-header">
+        <div class="grid-header-cell">
+         Company
+        </div>
+        <div class="grid-header-cell">
+         Role
+        </div>
+        <div class="grid-header-cell">
+         Date
+        </div>
+        <div class="grid-header-cell">
+         Min CGPA
+        </div>
+        <div class="grid-header-cell">
+         Departments
+        </div>
+        <div class="grid-header-cell">
+         Status
+        </div>
+        <div class="grid-header-cell">
+         Actions
+        </div>
+       </div>
+       <div class="grid-body" id="gridBody"><!-- Rows will be dynamically inserted here -->
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div><!-- Add Drive Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+   <div class="modal-card">
+    <div class="modal-header">
+     <h2 class="modal-title">Add New Drive</h2><button class="modal-close" id="modalClose"> <i class="fas fa-times"></i> </button>
+    </div>
+    <form id="driveForm">
+     <div class="form-group"><label class="form-label" for="companyName">Company Name</label> <input type="text" class="form-input" id="companyName" placeholder="Enter company name" required>
+     </div>
+     <div class="form-group"><label class="form-label" for="jobRole">Job Role</label> <input type="text" class="form-input" id="jobRole" placeholder="e.g. Software Engineer" required>
+     </div>
+     <div class="form-group"><label class="form-label" for="driveDate">Drive Date</label> <input type="date" class="form-input" id="driveDate" required>
+     </div>
+     <div class="form-group"><label class="form-label" for="minCGPA">Minimum CGPA</label> <input type="number" class="form-input" id="minCGPA" placeholder="e.g. 7.5" step="0.1" min="0" max="10" required>
+     </div>
+     <div class="form-group"><label class="form-label">Eligible Departments</label>
+      <div class="dept-checkboxes"><label class="checkbox-label"> <input type="checkbox" name="dept" value="CS"> <span>Computer Science</span> </label> <label class="checkbox-label"> <input type="checkbox" name="dept" value="IT"> <span>Information Technology</span> </label> <label class="checkbox-label"> <input type="checkbox" name="dept" value="Mech"> <span>Mechanical</span> </label> <label class="checkbox-label"> <input type="checkbox" name="dept" value="ECE"> <span>Electronics</span> </label> <label class="checkbox-label"> <input type="checkbox" name="dept" value="Civil"> <span>Civil</span> </label>
+      </div>
+     </div>
+     <div class="modal-actions"><button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button> <button type="submit" class="btn btn-primary">Save Drive</button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <script>
+        // Mock Data Initialization
+        const mockDrives = [
+            {
+                id: 1,
+                company: 'Infosys',
+                role: 'System Engineer',
+                date: '2024-12-28',
+                minCGPA: 7.0,
+                departments: ['CS', 'IT'],
+                status: 'upcoming'
+            },
+            {
+                id: 2,
+                company: 'Wipro',
+                role: 'Software Developer',
+                date: '2024-12-25',
+                minCGPA: 6.5,
+                departments: ['CS', 'IT', 'ECE'],
+                status: 'ongoing'
+            },
+            {
+                id: 3,
+                company: 'TCS',
+                role: 'Digital Engineer',
+                date: '2025-01-05',
+                minCGPA: 6.0,
+                departments: ['CS', 'IT', 'Mech'],
+                status: 'upcoming'
+            },
+            {
+                id: 4,
+                company: 'Cognizant',
+                role: 'Programmer Analyst',
+                date: '2025-01-10',
+                minCGPA: 7.5,
+                departments: ['CS', 'IT'],
+                status: 'upcoming'
+            },
+            {
+                id: 5,
+                company: 'Accenture',
+                role: 'Associate Software Engineer',
+                date: '2024-12-20',
+                minCGPA: 7.0,
+                departments: ['CS', 'IT', 'ECE', 'Civil'],
+                status: 'completed'
+            }
+        ];
+
+        // Initialize localStorage
+        function initializeData() {
+            if (!localStorage.getItem('tpo_drives')) {
+                localStorage.setItem('tpo_drives', JSON.stringify(mockDrives));
+            }
+        }
+
+        // Get drives from localStorage
+        function getDrives() {
+            return JSON.parse(localStorage.getItem('tpo_drives')) || [];
+        }
+
+        // Save drives to localStorage
+        function saveDrives(drives) {
+            localStorage.setItem('tpo_drives', JSON.stringify(drives));
+        }
+
+        // Get company logo letter and color
+        function getCompanyLogo(company) {
+            const colors = [
+                'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+                'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                'linear-gradient(135deg, #10b981, #059669)',
+                'linear-gradient(135deg, #f59e0b, #d97706)',
+                'linear-gradient(135deg, #ef4444, #dc2626)'
+            ];
+            const index = company.charCodeAt(0) % colors.length;
+            return {
+                letter: company.charAt(0).toUpperCase(),
+                color: colors[index]
+            };
+        }
+
+        // Render drives to grid
+        function renderDrives(drivesToRender) {
+            const gridBody = document.getElementById('gridBody');
+            
+            if (drivesToRender.length === 0) {
+                gridBody.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No drives found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            gridBody.innerHTML = drivesToRender.map((drive, index) => {
+                const logo = getCompanyLogo(drive.company);
+                const formattedDate = new Date(drive.date).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                return `
+                    <div class="grid-row" style="animation-delay: ${index * 0.1}s">
+                        <div class="grid-cell company-cell">
+                            <div class="company-logo" style="background: ${logo.color}">
+                                ${logo.letter}
+                            </div>
+                            <span class="company-name">${drive.company}</span>
+                        </div>
+                        <div class="grid-cell">${drive.role}</div>
+                        <div class="grid-cell">${formattedDate}</div>
+                        <div class="grid-cell">${drive.minCGPA}</div>
+                        <div class="grid-cell">${drive.departments.join(', ')}</div>
+                        <div class="grid-cell">
+                            <span class="status-badge ${drive.status}">
+                                <span class="status-dot"></span>
+                                ${drive.status}
+                            </span>
+                        </div>
+                        <div class="grid-cell actions-cell">
+                            <div class="action-icon" onclick="editDrive(${drive.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-icon delete" onclick="deleteDrive(${drive.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter and search drives
+        function filterDrives() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterSelect').value;
+            let drives = getDrives();
+
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                drives = drives.filter(drive => drive.status === statusFilter);
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                drives = drives.filter(drive => 
+                    drive.company.toLowerCase().includes(searchTerm) ||
+                    drive.role.toLowerCase().includes(searchTerm) ||
+                    drive.departments.some(dept => dept.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            renderDrives(drives);
+        }
+
+        // Delete drive
+        function deleteDrive(id) {
+            const confirmDelete = confirm('Are you sure you want to delete this drive?');
+            if (!confirmDelete) return;
+
+            let drives = getDrives();
+            drives = drives.filter(drive => drive.id !== id);
+            saveDrives(drives);
+            filterDrives();
+        }
+
+        // Edit drive (placeholder)
+        function editDrive(id) {
+            alert('Edit functionality - Drive ID: ' + id + '\n(This would open the modal with pre-filled data)');
+        }
+
+        // Modal controls
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const addDriveBtn = document.getElementById('addDriveBtn');
+        const modalClose = document.getElementById('modalClose');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const driveForm = document.getElementById('driveForm');
+
+        function openModal() {
+            modalBackdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalBackdrop.classList.remove('show');
+            document.body.style.overflow = 'auto';
+            driveForm.reset();
+        }
+
+        addDriveBtn.addEventListener('click', openModal);
+        modalClose.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                closeModal();
+            }
+        });
+
+        // Form submission
+        driveForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const selectedDepts = Array.from(document.querySelectorAll('input[name="dept"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedDepts.length === 0) {
+                alert('Please select at least one department');
+                return;
+            }
+
+            const drives = getDrives();
+            const newDrive = {
+                id: drives.length > 0 ? Math.max(...drives.map(d => d.id)) + 1 : 1,
+                company: document.getElementById('companyName').value,
+                role: document.getElementById('jobRole').value,
+                date: document.getElementById('driveDate').value,
+                minCGPA: parseFloat(document.getElementById('minCGPA').value),
+                departments: selectedDepts,
+                status: 'upcoming'
+            };
+
+            drives.push(newDrive);
+            saveDrives(drives);
+            closeModal();
+            filterDrives();
+        });
+
+        // Search and filter listeners
+        document.getElementById('searchInput').addEventListener('input', filterDrives);
+        document.getElementById('filterSelect').addEventListener('change', filterDrives);
+
+        // Mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            const blobs = document.querySelectorAll('.blob');
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 10;
+                const currentTransform = blob.style.transform || '';
+                const baseTransform = currentTransform.split('translate')[0];
+                blob.style.transform = `${baseTransform} translate(${mouseX * speed}px, ${mouseY * speed}px)`;
+            });
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initializeData();
+            filterDrives();
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a333c2127134212',t:'MTc2MzkyNzgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElevateConnect - TPO Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        /* Background Mesh Gradient */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 20% 30%, rgba(88, 28, 135, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(29, 78, 216, 0.3) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+            background-color: #0a0a0f;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent);
+            top: 10%;
+            left: 10%;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4), transparent);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 7s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3), transparent);
+            top: 50%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            height: 100%;
+            min-height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            position: fixed;
+            height: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .page-title-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #0a0a0f;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px 8px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Zone A - Filter Bar */
+        .filter-bar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .date-input {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .date-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 16px;
+            margin-left: auto;
+        }
+
+        .liquid-btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .liquid-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .liquid-btn:hover::before {
+            left: 100%;
+        }
+
+        .liquid-btn.primary {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4), 
+                        inset 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .liquid-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6), 
+                        inset 0 2px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .liquid-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .liquid-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .liquid-btn:active {
+            transform: scale(0.95);
+        }
+
+        .liquid-btn i {
+            margin-right: 8px;
+        }
+
+        /* Zone B - KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .kpi-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .kpi-icon.purple {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .kpi-icon.blue {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .kpi-icon.green {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .kpi-icon.cyan {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kpi-change.positive {
+            color: #10b981;
+        }
+
+        .kpi-change.negative {
+            color: #ef4444;
+        }
+
+        /* Chart Container Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-title i {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(139, 92, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b5cf6;
+            font-size: 16px;
+        }
+
+        .chart-badge {
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        .chart-container.tall {
+            height: 400px;
+        }
+
+        .chart-container.square {
+            height: 360px;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(139, 92, 246, 0.2);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                padding: 24px 12px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px;
+            }
+
+            .top-bar {
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-actions {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .liquid-btn {
+                flex: 1;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="bg-gradient">
+   <div class="blob blob-1"></div>
+   <div class="blob blob-2"></div>
+   <div class="blob blob-3"></div>
+  </div>
+  <div class="loading-overlay" id="loadingOverlay">
+   <div class="loading-spinner"></div>
+  </div>
+  <div class="dashboard"><!-- Sidebar -->
+   <aside class="sidebar">
+    <div class="logo"><i class="fas fa-graduation-cap"></i> <span>ElevateConnect</span>
+    </div>
+    <nav class="nav-items"><a href="#" class="nav-item"> <i class="fas fa-th-large"></i> <span>Dashboard</span> </a> <a href="#" class="nav-item"> <i class="fas fa-briefcase"></i> <span>Drives</span> </a> <a href="#" class="nav-item"> <i class="fas fa-file-alt"></i> <span>Applications</span> </a> <a href="#" class="nav-item"> <i class="fas fa-certificate"></i> <span>Certifications</span> </a> <a href="#" class="nav-item"> <i class="fas fa-users"></i> <span>Alumni Network</span> </a> <a href="#" class="nav-item"> <i class="fas fa-comments"></i> <span>Messages</span> </a> <a href="#" class="nav-item active"> <i class="fas fa-chart-line"></i> <span>Analytics</span> </a> <a href="#" class="nav-item"> <i class="fas fa-cog"></i> <span>Settings</span> </a>
+    </nav>
+   </aside><!-- Main Content -->
+   <main class="main-content"><!-- Top Bar -->
+    <header class="top-bar">
+     <div class="page-title-section">
+      <h1 class="page-title">TPO Analytics &amp; Reports</h1>
+      <p class="page-subtitle">Deep insights into placement performance</p>
+     </div>
+     <div class="top-bar-actions">
+      <div class="notification-btn"><i class="fas fa-bell"></i>
+       <div class="notification-badge"></div>
+      </div>
+      <div class="user-profile">
+       <div class="user-avatar">
+        T
+       </div>
+       <div class="user-info">
+        <div class="user-name">
+         TPO Admin
+        </div>
+        <div class="user-role">
+         Placement Officer
+        </div>
+       </div>
+      </div>
+     </div>
+    </header><!-- Content Area -->
+    <div class="content-area"><!-- Zone A - Filter Bar -->
+     <div class="filter-bar">
+      <div class="filter-group"><label class="filter-label">Start Date</label> <input type="date" class="date-input" id="startDate">
+      </div>
+      <div class="filter-group"><label class="filter-label">End Date</label> <input type="date" class="date-input" id="endDate">
+      </div>
+      <div class="filter-actions"><button class="liquid-btn primary" onclick="applyFilters()"> <i class="fas fa-filter"></i> Filter </button> <button class="liquid-btn secondary" onclick="exportReport()"> <i class="fas fa-file-export"></i> Export Report </button>
+      </div>
+     </div><!-- Zone B - KPI Cards -->
+     <div class="kpi-grid">
+      <div class="kpi-card">
+       <div class="kpi-header"><span class="kpi-title">Total Placed</span>
+        <div class="kpi-icon purple"><i class="fas fa-user-check"></i>
+        </div>
+       </div>
+       <div class="kpi-value" id="kpiTotalPlaced">
+        485
+       </div>
+       <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span>+12% from last year</span>
+       </div>
+      </div>
+      <div class="kpi-card">
+       <div class="kpi-header"><span class="kpi-title">Avg Package</span>
+        <div class="kpi-icon blue"><i class="fas fa-rupee-sign"></i>
+        </div>
+       </div>
+       <div class="kpi-value" id="kpiAvgPackage">
+        8.5 LPA
+       </div>
+       <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span>+18% from last year</span>
+       </div>
+      </div>
+      <div class="kpi-card">
+       <div class="kpi-header"><span class="kpi-title">Placement %</span>
+        <div class="kpi-icon green"><i class="fas fa-percentage"></i>
+        </div>
+       </div>
+       <div class="kpi-value" id="kpiPlacementPercent">
+        78.5%
+       </div>
+       <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span>+5% from last year</span>
+       </div>
+      </div>
+      <div class="kpi-card">
+       <div class="kpi-header"><span class="kpi-title">Active Companies</span>
+        <div class="kpi-icon cyan"><i class="fas fa-building"></i>
+        </div>
+       </div>
+       <div class="kpi-value" id="kpiActiveCompanies">
+        124
+       </div>
+       <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span>+22 new companies</span>
+       </div>
+      </div>
+     </div><!-- Charts Grid -->
+     <div class="charts-grid"><!-- Zone C - Department-wise Placement (Bar Chart) -->
+      <div class="chart-card">
+       <div class="chart-header">
+        <div class="chart-title"><i class="fas fa-chart-bar"></i> Department-wise Placement
+        </div><span class="chart-badge">2024 Batch</span>
+       </div>
+       <div class="chart-container tall">
+        <canvas id="departmentChart"></canvas>
+       </div>
+      </div><!-- Zone D - Rejection Reasons (Doughnut Chart) -->
+      <div class="chart-card">
+       <div class="chart-header">
+        <div class="chart-title"><i class="fas fa-chart-pie"></i> Rejection Analysis
+        </div>
+       </div>
+       <div class="chart-container square">
+        <canvas id="rejectionChart"></canvas>
+       </div>
+      </div>
+     </div><!-- Zone E - Certification & Skill Improvement (Line Chart) -->
+     <div class="chart-card full-width">
+      <div class="chart-header">
+       <div class="chart-title"><i class="fas fa-chart-line"></i> Certification &amp; Skill Improvement Trend
+       </div><span class="chart-badge">Last 12 Months</span>
+      </div>
+      <div class="chart-container">
+       <canvas id="skillChart"></canvas>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+        // ============= CHART.JS CONFIGURATION =============
+        
+        // Set global chart defaults for dark theme
+        Chart.defaults.color = '#ffffff';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+        Chart.defaults.backgroundColor = 'rgba(139, 92, 246, 0.2)';
+
+        // ============= MOCK DATA =============
+
+        let originalData = {
+            departments: [
+                { dept: 'Computer Science', placed: 145, total: 180, shortName: 'CS' },
+                { dept: 'Information Tech', placed: 128, total: 160, shortName: 'IT' },
+                { dept: 'Electronics', placed: 92, total: 140, shortName: 'ECE' },
+                { dept: 'Mechanical', placed: 78, total: 130, shortName: 'MECH' },
+                { dept: 'Civil', placed: 42, total: 110, shortName: 'CIVIL' }
+            ],
+            rejections: [
+                { reason: 'Technical Skills Gap', count: 145 },
+                { reason: 'Communication Issues', count: 98 },
+                { reason: 'Lack of Projects', count: 76 },
+                { reason: 'Low CGPA', count: 54 },
+                { reason: 'Aptitude Scores', count: 42 }
+            ],
+            skillTrend: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                certifications: [45, 52, 68, 73, 89, 95, 112, 128, 145, 162, 178, 195],
+                skillScore: [65, 67, 70, 72, 75, 78, 80, 82, 85, 87, 89, 91]
+            }
+        };
+
+        let currentData = JSON.parse(JSON.stringify(originalData));
+
+        let departmentChartInstance = null;
+        let rejectionChartInstance = null;
+        let skillChartInstance = null;
+
+        // ============= INITIALIZATION =============
+
+        function initializeDates() {
+            const today = dayjs();
+            const startOfYear = today.startOf('year');
+            
+            document.getElementById('startDate').value = startOfYear.format('YYYY-MM-DD');
+            document.getElementById('endDate').value = today.format('YYYY-MM-DD');
+        }
+
+        // ============= CHART INITIALIZATION =============
+
+        function initCharts() {
+            // Department-wise Placement Bar Chart
+            const deptCtx = document.getElementById('departmentChart').getContext('2d');
+            departmentChartInstance = new Chart(deptCtx, {
+                type: 'bar',
+                data: {
+                    labels: currentData.departments.map(d => d.shortName),
+                    datasets: [
+                        {
+                            label: 'Placed Students',
+                            data: currentData.departments.map(d => d.placed),
+                            backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            barThickness: 40
+                        },
+                        {
+                            label: 'Total Students',
+                            data: currentData.departments.map(d => d.total),
+                            backgroundColor: 'rgba(59, 130, 246, 0.4)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            barThickness: 40
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' },
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 15, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#a78bfa',
+                            borderColor: 'rgba(139, 92, 246, 0.5)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const dept = currentData.departments[context.dataIndex];
+                                    const percentage = ((dept.placed / dept.total) * 100).toFixed(1);
+                                    return `Placement Rate: ${percentage}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Rejection Reasons Doughnut Chart
+            const rejCtx = document.getElementById('rejectionChart').getContext('2d');
+            rejectionChartInstance = new Chart(rejCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: currentData.rejections.map(r => r.reason),
+                    datasets: [{
+                        data: currentData.rejections.map(r => r.count),
+                        backgroundColor: [
+                            'rgba(236, 72, 153, 0.6)',  // Magenta
+                            'rgba(139, 92, 246, 0.6)',  // Purple
+                            'rgba(6, 182, 212, 0.6)',   // Cyan
+                            'rgba(132, 204, 22, 0.6)',  // Lime
+                            'rgba(59, 130, 246, 0.6)'   // Blue
+                        ],
+                        borderColor: [
+                            'rgba(236, 72, 153, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(6, 182, 212, 1)',
+                            'rgba(132, 204, 22, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 11, weight: '600' },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 15, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#a78bfa',
+                            borderColor: 'rgba(139, 92, 246, 0.5)',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Skill Improvement Line Chart
+            const skillCtx = document.getElementById('skillChart').getContext('2d');
+            skillChartInstance = new Chart(skillCtx, {
+                type: 'line',
+                data: {
+                    labels: currentData.skillTrend.months,
+                    datasets: [
+                        {
+                            label: 'Certifications Completed',
+                            data: currentData.skillTrend.certifications,
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgba(139, 92, 246, 1)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Average Skill Score',
+                            data: currentData.skillTrend.skillScore,
+                            borderColor: 'rgba(6, 182, 212, 1)',
+                            backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgba(6, 182, 212, 1)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' },
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 15, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#a78bfa',
+                            borderColor: 'rgba(139, 92, 246, 0.5)',
+                            borderWidth: 1,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: { size: 12, weight: '600' }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        // ============= FILTERING LOGIC =============
+
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                showToast('Please select both start and end dates');
+                return;
+            }
+
+            if (dayjs(startDate).isAfter(dayjs(endDate))) {
+                showToast('Start date must be before end date');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('show');
+
+            // Simulate filtering with random adjustments
+            setTimeout(() => {
+                // Adjust department data
+                currentData.departments = originalData.departments.map(dept => ({
+                    ...dept,
+                    placed: Math.floor(dept.placed * (0.85 + Math.random() * 0.3)),
+                    total: dept.total
+                }));
+
+                // Adjust rejection data
+                currentData.rejections = originalData.rejections.map(rej => ({
+                    ...rej,
+                    count: Math.floor(rej.count * (0.8 + Math.random() * 0.4))
+                }));
+
+                // Adjust skill trend (slightly)
+                currentData.skillTrend.certifications = originalData.skillTrend.certifications.map(
+                    val => Math.floor(val * (0.9 + Math.random() * 0.2))
+                );
+                currentData.skillTrend.skillScore = originalData.skillTrend.skillScore.map(
+                    val => Math.floor(val * (0.95 + Math.random() * 0.1))
+                );
+
+                // Update KPIs
+                updateKPIs();
+
+                // Update charts
+                updateCharts();
+
+                // Hide loading
+                document.getElementById('loadingOverlay').classList.remove('show');
+
+                showToast('Filters applied successfully!');
+            }, 1000);
+        }
+
+        function updateKPIs() {
+            const totalPlaced = currentData.departments.reduce((sum, dept) => sum + dept.placed, 0);
+            const totalStudents = currentData.departments.reduce((sum, dept) => sum + dept.total, 0);
+            const placementPercent = ((totalPlaced / totalStudents) * 100).toFixed(1);
+            const avgPackage = (7.5 + Math.random() * 2).toFixed(1);
+
+            document.getElementById('kpiTotalPlaced').textContent = totalPlaced;
+            document.getElementById('kpiAvgPackage').textContent = `${avgPackage} LPA`;
+            document.getElementById('kpiPlacementPercent').textContent = `${placementPercent}%`;
+        }
+
+        function updateCharts() {
+            // Update Department Chart
+            departmentChartInstance.data.datasets[0].data = currentData.departments.map(d => d.placed);
+            departmentChartInstance.data.datasets[1].data = currentData.departments.map(d => d.total);
+            departmentChartInstance.update('active');
+
+            // Update Rejection Chart
+            rejectionChartInstance.data.datasets[0].data = currentData.rejections.map(r => r.count);
+            rejectionChartInstance.update('active');
+
+            // Update Skill Chart
+            skillChartInstance.data.datasets[0].data = currentData.skillTrend.certifications;
+            skillChartInstance.data.datasets[1].data = currentData.skillTrend.skillScore;
+            skillChartInstance.update('active');
+        }
+
+        // ============= EXPORT LOGIC =============
+
+        function exportReport() {
+            // Create CSV content
+            let csvContent = 'Department,Placed Students,Total Students,Placement Rate (%)\n';
+            
+            currentData.departments.forEach(dept => {
+                const rate = ((dept.placed / dept.total) * 100).toFixed(2);
+                csvContent += `${dept.dept},${dept.placed},${dept.total},${rate}\n`;
+            });
+
+            csvContent += '\n\nRejection Reasons Analysis\n';
+            csvContent += 'Reason,Count\n';
+            currentData.rejections.forEach(rej => {
+                csvContent += `${rej.reason},${rej.count}\n`;
+            });
+
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `placement_report_${dayjs().format('YYYY-MM-DD')}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Report exported successfully!');
+        }
+
+        // ============= TOAST NOTIFICATION =============
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                padding: 16px 24px;
+                background: rgba(139, 92, 246, 0.9);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(139, 92, 246, 0.5);
+                border-radius: 12px;
+                color: #ffffff;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ============= MOUSE PARALLAX =============
+
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            const blobs = document.querySelectorAll('.blob');
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 10;
+                blob.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px)`;
+            });
+        });
+
+        // ============= INITIALIZATION =============
+
+        window.addEventListener('load', () => {
+            initializeDates();
+            initCharts();
+            console.log('TPO Analytics Dashboard Loaded');
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a339ae8c3e6ff6e',t:'MTc2MzkzMTcyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
