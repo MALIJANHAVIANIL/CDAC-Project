@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getActiveDrives } from '../services/driveService';
 
 const DriveManagement: React.FC = () => {
-    const [drives, setDrives] = useState([
-        { id: 1, company: "TechCorp", role: "Frontend Developer", date: "2024-10-15", package: "12 LPA", depts: ["CSE", "IT"], status: "Ongoing" },
-        { id: 2, company: "DataFlow", role: "Data Analyst", date: "2024-10-20", package: "10 LPA", depts: ["CSE", "IT", "ECE"], status: "Upcoming" },
-        { id: 3, company: "CloudNet", role: "DevOps Engineer", date: "2024-10-25", package: "15 LPA", depts: ["CSE", "IT"], status: "Ongoing" },
-    ]);
+    const [drives, setDrives] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDrives = async () => {
+            try {
+                const data = await getActiveDrives();
+                setDrives(data);
+            } catch (err) {
+                console.error("Failed to fetch drives", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDrives();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex-1 flex items-center justify-center min-h-screen bg-[#0a0a0f]">
+                <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 flex flex-col min-h-screen bg-[#0a0a0f] text-white">
@@ -71,18 +91,20 @@ const DriveManagement: React.FC = () => {
                                             </td>
                                             <td className="py-5 px-4">
                                                 <div className="text-sm font-semibold">{drive.role}</div>
-                                                <div className="text-xs text-[#10b981] font-medium">{drive.package}</div>
+                                                <div className="text-xs text-[#10b981] font-medium">{drive.package || drive.salary}</div>
                                             </td>
-                                            <td className="py-5 px-4 text-sm text-white/70">{drive.date}</td>
+                                            <td className="py-5 px-4 text-sm text-white/70">{drive.date || 'TBA'}</td>
                                             <td className="py-5 px-4">
                                                 <div className="flex gap-1">
-                                                    {drive.depts.map(d => (
+                                                    {drive.depts ? drive.depts.map((d: string) => (
                                                         <span key={d} className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-white/50">{d}</span>
-                                                    ))}
+                                                    )) : (
+                                                        <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-white/50">{drive.eligibility}</span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="py-5 px-4">
-                                                <span className={`px-4 py-1 rounded-full text-[11px] font-bold ${drive.status === 'Ongoing' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                                                <span className={`px-4 py-1 rounded-full text-[11px] font-bold ${drive.status === 'Ongoing' || drive.status === 'Open' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
                                                     {drive.status}
                                                 </span>
                                             </td>

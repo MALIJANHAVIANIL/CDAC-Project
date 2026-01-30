@@ -11,6 +11,10 @@ import Applications from './pages/Applications';
 import RejectionAnalysis from './pages/RejectionAnalysis';
 import { useLocation } from 'react-router-dom';
 import Auth from './pages/Auth';
+import { UserProvider } from './context/UserContext';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import Profile from './pages/Profile';
+import DriveDetails from './pages/DriveDetails';
 
 const ScrollToHash = () => {
     const { hash, pathname } = useLocation();
@@ -34,29 +38,65 @@ const ScrollToHash = () => {
 
 function App() {
     return (
-        <Router>
-            <div className="min-h-screen bg-[#0a0a0f] selection:bg-purple-500/30">
-                <ScrollToHash />
-                <BackgroundGradient />
-                <Routes>
-                    <Route path="/" element={
-                        <>
-                            <Navbar />
-                            <main>
-                                <LandingPage />
-                            </main>
-                            <Footer />
-                        </>
-                    } />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/drives" element={<PlacementDrives />} />
-                    <Route path="/admin/drives" element={<DriveManagement />} />
-                    <Route path="/applications" element={<Applications />} />
-                    <Route path="/analysis" element={<RejectionAnalysis />} />
-                    <Route path="/auth" element={<Auth />} />
-                </Routes>
-            </div>
-        </Router>
+        <UserProvider>
+            <Router>
+                <div className="min-h-screen bg-[#0a0a0f] selection:bg-purple-500/30">
+                    <ScrollToHash />
+                    <BackgroundGradient />
+                    <Routes>
+                        <Route path="/" element={
+                            <>
+                                <Navbar />
+                                <main>
+                                    <LandingPage />
+                                </main>
+                                <Footer />
+                            </>
+                        } />
+                        <Route path="/auth" element={<Auth />} />
+
+                        {/* Protected Routes */}
+                        <Route path="/dashboard" element={
+                            <ProtectedRoute>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/profile" element={
+                            <ProtectedRoute>
+                                <Profile />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/drives" element={
+                            <ProtectedRoute role="STUDENT">
+                                <PlacementDrives />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/drives/:id" element={
+                            <ProtectedRoute role="STUDENT">
+                                <DriveDetails />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/applications" element={
+                            <ProtectedRoute role="STUDENT">
+                                <Applications />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/analysis" element={
+                            <ProtectedRoute role="STUDENT">
+                                <RejectionAnalysis />
+                            </ProtectedRoute>
+                        } />
+
+                        {/* Admin Routes */}
+                        <Route path="/admin/drives" element={
+                            <ProtectedRoute role="ADMIN">
+                                <DriveManagement />
+                            </ProtectedRoute>
+                        } />
+                    </Routes>
+                </div>
+            </Router>
+        </UserProvider>
     );
 }
 

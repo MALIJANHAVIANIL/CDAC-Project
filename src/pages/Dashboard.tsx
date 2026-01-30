@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useUser } from '../context/UserContext';
+import { getStudentStats, getTpoStats } from '../services/analyticsService';
 
 const Dashboard: React.FC = () => {
+    const { user, logout } = useUser();
+    const [stats, setStats] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = user?.role === 'ADMIN' ? await getTpoStats() : await getStudentStats();
+                setStats(data);
+            } catch (err) {
+                console.error("Failed to fetch stats", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, [user]);
+
     return (
         <div className="flex min-h-screen bg-[#0a0a0f] text-white">
             {/* Sidebar - Modern Mini Version */}
@@ -16,6 +36,13 @@ const Dashboard: React.FC = () => {
                     <NavItem icon="📊" title="Analytics" />
                     <NavItem icon="✉️" title="Messages" />
                 </nav>
+                <button
+                    onClick={logout}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white/50 hover:bg-red-500/20 hover:text-red-500 transition-all mb-4"
+                    title="Logout"
+                >
+                    <span className="text-xl">🚪</span>
+                </button>
             </aside>
 
             {/* Main Content */}
@@ -35,8 +62,8 @@ const Dashboard: React.FC = () => {
                             🔔
                             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
                         </div>
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold">
-                            VS
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold uppercase">
+                            {user?.name?.substring(0, 2) || '??'}
                         </div>
                     </div>
                 </header>
@@ -45,47 +72,55 @@ const Dashboard: React.FC = () => {
                 <div className="p-8">
                     <div className="mb-8">
                         <h1 className="text-3xl font-extrabold bg-gradient-to-br from-white to-[#a78bfa] bg-clip-text text-transparent">
-                            Welcome back, Vishwal!
+                            Welcome back, {user?.name}!
                         </h1>
-                        <p className="text-white/50">Your placement journey is 85% complete.</p>
+                        <p className="text-white/50">
+                            {user?.role === 'ADMIN' ? 'Manage your placement ecosystem.' : 'Your placement journey is 85% complete.'}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-[200px] gap-6">
                         {/* Eligibility Widget */}
-                        <Widget title="Placement Eligibility" icon="🎓" className="lg:col-span-2 lg:row-span-2">
+                        <Widget title={user?.role === 'ADMIN' ? 'Total Students' : 'Placement Eligibility'} icon="🎓" className="lg:col-span-2 lg:row-span-2">
                             <div className="flex flex-col gap-5 h-full">
                                 <div className="text-center">
                                     <div className="w-32 h-32 rounded-full border-8 border-purple-500/20 border-t-purple-500 flex items-center justify-center mx-auto mb-4 relative">
-                                        <span className="text-3xl font-bold bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent">8.5</span>
+                                        <span className="text-3xl font-bold bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent">
+                                            {user?.role === 'ADMIN' ? stats?.totalStudents || 0 : user?.cgpa || '8.5'}
+                                        </span>
                                     </div>
-                                    <p className="text-sm text-white/50">Current CGPA</p>
+                                    <p className="text-sm text-white/50">{user?.role === 'ADMIN' ? 'Registered Students' : 'Current CGPA'}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="bg-white/3 p-3 rounded-xl text-center">
-                                        <div className="text-green-500 font-bold mb-1">Pass</div>
-                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">Aptitude</div>
+                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.placedCount || 0 : 'Pass'}</div>
+                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">{user?.role === 'ADMIN' ? 'Placed' : 'Aptitude'}</div>
                                     </div>
                                     <div className="bg-white/3 p-3 rounded-xl text-center">
-                                        <div className="text-green-500 font-bold mb-1">Clear</div>
-                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">Backlogs</div>
+                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.ongoingDrives || 0 : 'Clear'}</div>
+                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">{user?.role === 'ADMIN' ? 'Active Drives' : 'Backlogs'}</div>
                                     </div>
                                 </div>
                             </div>
                         </Widget>
 
-                        {/* Upcoming Drives */}
-                        <Widget title="Upcoming Drives" icon="🚀" className="lg:row-span-2">
+                        {/* Recent Activity / Upcoming Drives */}
+                        <Widget title={user?.role === 'ADMIN' ? 'Recent Activity' : 'Upcoming Drives'} icon="🚀" className="lg:row-span-2">
                             <div className="flex flex-col gap-3">
-                                <DriveItem company="Google" date="Oct 15, 2024" logo="G" />
-                                <DriveItem company="Microsoft" date="Oct 20, 2024" logo="M" />
-                                <DriveItem company="Amazon" date="Oct 25, 2024" logo="A" />
+                                {(stats?.upcomingDrives || stats?.activities || [
+                                    { company: "Google", date: "Oct 15, 2024", logo: "G" },
+                                    { company: "Microsoft", date: "Oct 20, 2024", logo: "M" },
+                                    { company: "Amazon", date: "Oct 25, 2024", logo: "A" }
+                                ]).map((item: any, idx: number) => (
+                                    <DriveItem key={idx} company={item.company} date={item.date} logo={item.company[0]} />
+                                ))}
                             </div>
                         </Widget>
 
                         {/* Quick Actions */}
                         <Widget title="Quick Actions" icon="⚡">
                             <button className="w-full py-3 bg-gradient-to-r from-[#8b5cf6] to-[#3b82f6] rounded-xl font-semibold mb-3 hover:shadow-lg hover:shadow-purple-500/30 transition-all">
-                                Apply Now
+                                {user?.role === 'ADMIN' ? 'Post New Drive' : 'Apply Now'}
                             </button>
                         </Widget>
                     </div>

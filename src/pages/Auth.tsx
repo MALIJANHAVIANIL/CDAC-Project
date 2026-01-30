@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { login, register } from '../services/authService';
+import { useUser } from '../context/UserContext';
 
 const Auth: React.FC = () => {
     const location = useLocation();
@@ -44,6 +45,9 @@ const Auth: React.FC = () => {
         { icon: '📊', title: 'Real-time Analytics' }
     ];
 
+    const { setUser } = useUser();
+    const { state } = useLocation();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -51,8 +55,22 @@ const Auth: React.FC = () => {
 
         try {
             if (isLogin) {
-                await login({ email: formData.email, password: formData.password });
-                navigate('/dashboard');
+                const token = await login({ email: formData.email, password: formData.password });
+
+                // For now, simulate user data from the form/role
+                // In a real app, this would be fetched from /auth/me or decoded from JWT
+                const user = {
+                    id: '1',
+                    name: formData.email.split('@')[0],
+                    email: formData.email,
+                    role: selectedRole as 'STUDENT' | 'ADMIN',
+                };
+
+                localStorage.setItem('user', JSON.stringify(user));
+                setUser(user);
+
+                const from = (state as any)?.from?.pathname || '/dashboard';
+                navigate(from, { replace: true });
             } else {
                 await register({
                     ...formData,
@@ -127,8 +145,8 @@ const Auth: React.FC = () => {
                                 key={role.id}
                                 onClick={() => setSelectedRole(role.id)}
                                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${selectedRole === role.id
-                                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
                                     }`}
                             >
                                 {role.label}
