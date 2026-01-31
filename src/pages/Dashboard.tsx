@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../context/UserContext';
 import { getStudentStats, getTpoStats } from '../services/analyticsService';
+import { useNavigate } from 'react-router-dom';
+
+import Sidebar from '../components/common/Sidebar';
 
 const Dashboard: React.FC = () => {
-    const { user, logout } = useUser();
+    const { user } = useUser();
     const [stats, setStats] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -15,8 +19,6 @@ const Dashboard: React.FC = () => {
                 setStats(data);
             } catch (err) {
                 console.error("Failed to fetch stats", err);
-            } finally {
-                setLoading(false);
             }
         };
         fetchStats();
@@ -25,25 +27,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className="flex min-h-screen bg-[#0a0a0f] text-white">
             {/* Sidebar - Modern Mini Version */}
-            <aside className="w-20 bg-white/5 backdrop-blur-[20px] border-r border-white/10 flex flex-col items-center py-6 fixed h-full z-[100]">
-                <div className="text-2xl font-extrabold bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent mb-12">
-                    E
-                </div>
-                <nav className="flex flex-col gap-6 flex-1">
-                    <NavItem icon="🏠" active title="Dashboard" />
-                    <NavItem icon="💼" title="Placements" />
-                    <NavItem icon="📄" title="Applications" />
-                    <NavItem icon="📊" title="Analytics" />
-                    <NavItem icon="✉️" title="Messages" />
-                </nav>
-                <button
-                    onClick={logout}
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white/50 hover:bg-red-500/20 hover:text-red-500 transition-all mb-4"
-                    title="Logout"
-                >
-                    <span className="text-xl">🚪</span>
-                </button>
-            </aside>
+            <Sidebar />
 
             {/* Main Content */}
             <main className="flex-1 ml-20 flex flex-col">
@@ -57,12 +41,62 @@ const Dashboard: React.FC = () => {
                         />
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40">🔍</span>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center relative hover:bg-white/10 transition-colors pointer-cursor">
+                    <div className="flex items-center gap-6 relative">
+                        {/* Notification Icon */}
+                        <div
+                            className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center relative hover:bg-white/10 transition-colors cursor-pointer"
+                            onClick={() => setShowNotifications(!showNotifications)}
+                        >
                             🔔
                             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
                         </div>
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold uppercase">
+
+                        {/* Notification Dropdown */}
+                        {showNotifications && (
+                            <div className="absolute top-14 right-20 w-80 bg-[#1a1a24] border border-white/10 rounded-2xl shadow-xl z-[100] overflow-hidden">
+                                <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                                    <h3 className="font-bold">Notifications</h3>
+                                    <button className="text-xs text-[#8b5cf6] hover:underline">Mark all read</button>
+                                </div>
+                                <div className="max-h-[300px] overflow-y-auto">
+                                    <div className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                                        <div className="flex gap-3">
+                                            <div className="text-xl">🚀</div>
+                                            <div>
+                                                <p className="text-sm font-semibold">New Drive: Google</p>
+                                                <p className="text-xs text-white/50">Software Engineer Role posted.</p>
+                                                <p className="text-[10px] text-white/30 mt-1">2 hours ago</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                                        <div className="flex gap-3">
+                                            <div className="text-xl">📄</div>
+                                            <div>
+                                                <p className="text-sm font-semibold">Application Viewing</p>
+                                                <p className="text-xs text-white/50">Your resume was viewed by TCS.</p>
+                                                <p className="text-[10px] text-white/30 mt-1">5 hours ago</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 hover:bg-white/5 transition-colors cursor-pointer">
+                                        <div className="flex gap-3">
+                                            <div className="text-xl">✅</div>
+                                            <div>
+                                                <p className="text-sm font-semibold">Profile Complete</p>
+                                                <p className="text-xs text-white/50">You reached 85% profile completion!</p>
+                                                <p className="text-[10px] text-white/30 mt-1">1 day ago</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 text-center border-t border-white/10">
+                                    <button className="text-xs text-white/50 hover:text-white">View All Notifications</button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold uppercase cursor-pointer" onClick={() => navigate('/profile')}>
                             {user?.name?.substring(0, 2) || '??'}
                         </div>
                     </div>
@@ -86,18 +120,18 @@ const Dashboard: React.FC = () => {
                                 <div className="text-center">
                                     <div className="w-32 h-32 rounded-full border-8 border-purple-500/20 border-t-purple-500 flex items-center justify-center mx-auto mb-4 relative">
                                         <span className="text-3xl font-bold bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent">
-                                            {user?.role === 'ADMIN' ? stats?.totalStudents || 0 : user?.cgpa || '8.5'}
+                                            {user?.role === 'ADMIN' ? stats?.totalStudents || 0 : (user?.cgpa ? user.cgpa : 'N/A')}
                                         </span>
                                     </div>
                                     <p className="text-sm text-white/50">{user?.role === 'ADMIN' ? 'Registered Students' : 'Current CGPA'}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="bg-white/3 p-3 rounded-xl text-center">
-                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.placedCount || 0 : 'Pass'}</div>
-                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">{user?.role === 'ADMIN' ? 'Placed' : 'Aptitude'}</div>
+                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.placedCount || 0 : 'Pending'}</div>
+                                        <div className="text-[10px] opacity-50 uppercase tracking-wider">{user?.role === 'ADMIN' ? 'Placed' : 'AptitudeStatus'}</div>
                                     </div>
                                     <div className="bg-white/3 p-3 rounded-xl text-center">
-                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.ongoingDrives || 0 : 'Clear'}</div>
+                                        <div className="text-green-500 font-bold mb-1">{user?.role === 'ADMIN' ? stats?.ongoingDrives || 0 : 'Pending'}</div>
                                         <div className="text-[10px] opacity-50 uppercase tracking-wider">{user?.role === 'ADMIN' ? 'Active Drives' : 'Backlogs'}</div>
                                     </div>
                                 </div>
@@ -107,19 +141,24 @@ const Dashboard: React.FC = () => {
                         {/* Recent Activity / Upcoming Drives */}
                         <Widget title={user?.role === 'ADMIN' ? 'Recent Activity' : 'Upcoming Drives'} icon="🚀" className="lg:row-span-2">
                             <div className="flex flex-col gap-3">
-                                {(stats?.upcomingDrives || stats?.activities || [
-                                    { company: "Google", date: "Oct 15, 2024", logo: "G" },
-                                    { company: "Microsoft", date: "Oct 20, 2024", logo: "M" },
-                                    { company: "Amazon", date: "Oct 25, 2024", logo: "A" }
-                                ]).map((item: any, idx: number) => (
-                                    <DriveItem key={idx} company={item.company} date={item.date} logo={item.company[0]} />
+                                {(stats?.upcomingDrives && stats.upcomingDrives.length > 0 ? stats.upcomingDrives : []).map((item: any, idx: number) => (
+                                    <DriveItem
+                                        key={idx}
+                                        company={item.companyName || item.company}
+                                        date={new Date(item.date).toLocaleDateString()}
+                                        logo={(item.companyName || item.company)[0]}
+                                        onClick={() => navigate('/placements')}
+                                    />
                                 ))}
                             </div>
                         </Widget>
 
                         {/* Quick Actions */}
                         <Widget title="Quick Actions" icon="⚡">
-                            <button className="w-full py-3 bg-gradient-to-r from-[#8b5cf6] to-[#3b82f6] rounded-xl font-semibold mb-3 hover:shadow-lg hover:shadow-purple-500/30 transition-all">
+                            <button
+                                onClick={() => navigate(user?.role === 'ADMIN' ? '/post-drive' : '/placements')}
+                                className="w-full py-3 bg-gradient-to-r from-[#8b5cf6] to-[#3b82f6] rounded-xl font-semibold mb-3 hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+                            >
                                 {user?.role === 'ADMIN' ? 'Post New Drive' : 'Apply Now'}
                             </button>
                         </Widget>
@@ -130,11 +169,7 @@ const Dashboard: React.FC = () => {
     );
 };
 
-const NavItem = ({ icon, active = false, title }: { icon: string, active?: boolean, title: string }) => (
-    <div className={`w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer transition-all ${active ? 'bg-[#8b5cf6]/20 text-[#8b5cf6] shadow-[0_4px_16px_rgba(139,92,246,0.3)]' : 'text-white/50 hover:bg-white/5 hover:text-white'}`} title={title}>
-        <span className="text-xl">{icon}</span>
-    </div>
-);
+
 
 const Widget = ({ title, icon, children, className = "" }: { title: string, icon: string, children: React.ReactNode, className?: string }) => (
     <motion.div
@@ -150,8 +185,11 @@ const Widget = ({ title, icon, children, className = "" }: { title: string, icon
     </motion.div>
 );
 
-const DriveItem = ({ company, date, logo }: { company: string, date: string, logo: string }) => (
-    <div className="flex items-center gap-3 p-3 bg-white/3 rounded-xl hover:bg-white/8 hover:translate-x-1 transition-all cursor-pointer">
+const DriveItem = ({ company, date, logo, onClick }: { company: string, date: string, logo: string, onClick?: () => void }) => (
+    <div
+        onClick={onClick}
+        className="flex items-center gap-3 p-3 bg-white/3 rounded-xl hover:bg-white/8 hover:translate-x-1 transition-all cursor-pointer"
+    >
         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] flex items-center justify-center font-bold">{logo}</div>
         <div className="flex-1">
             <div className="text-sm font-semibold">{company}</div>

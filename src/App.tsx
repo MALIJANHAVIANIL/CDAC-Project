@@ -15,6 +15,7 @@ import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Profile from './pages/Profile';
 import DriveDetails from './pages/DriveDetails';
+import Analytics from './pages/Analytics';
 
 const ScrollToHash = () => {
     const { hash, pathname } = useLocation();
@@ -66,7 +67,7 @@ function App() {
                                 <Profile />
                             </ProtectedRoute>
                         } />
-                        <Route path="/drives" element={
+                        <Route path="/placements" element={
                             <ProtectedRoute role="STUDENT">
                                 <PlacementDrives />
                             </ProtectedRoute>
@@ -86,6 +87,11 @@ function App() {
                                 <RejectionAnalysis />
                             </ProtectedRoute>
                         } />
+                        <Route path="/analytics" element={
+                            <ProtectedRoute role="STUDENT">
+                                <Analytics />
+                            </ProtectedRoute>
+                        } />
 
                         {/* Admin Routes */}
                         <Route path="/admin/drives" element={
@@ -96,7 +102,7 @@ function App() {
                     </Routes>
                 </div>
             </Router>
-        </UserProvider>
+        </UserProvider >
     );
 }
 

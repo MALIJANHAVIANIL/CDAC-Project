@@ -5,9 +5,12 @@ export const login = async (credentials: any) => {
         method: 'POST',
         body: JSON.stringify(credentials),
     });
-    const token = await response.text();
-    localStorage.setItem('token', token);
-    return token;
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    // Store user info without token to avoid duplication/bloat
+    const { token, ...userData } = data;
+    localStorage.setItem('user', JSON.stringify(userData));
+    return data;
 };
 
 export const register = async (userData: any) => {
