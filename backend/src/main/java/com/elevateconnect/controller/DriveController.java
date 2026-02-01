@@ -2,8 +2,10 @@ package com.elevateconnect.controller;
 
 import com.elevateconnect.model.PlacementDrive;
 import com.elevateconnect.model.Application;
+import com.elevateconnect.model.User;
 import com.elevateconnect.repository.PlacementDriveRepository;
 import com.elevateconnect.repository.ApplicationRepository;
+import com.elevateconnect.repository.UserRepository;
 import com.elevateconnect.model.ApprovalStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +65,9 @@ public class DriveController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Autowired
+    com.elevateconnect.service.EmailService emailService;
+
     @PostMapping
     public PlacementDrive createDrive(@RequestBody PlacementDrive drive) {
         org.springframework.security.core.userdetails.UserDetails userDetails = (org.springframework.security.core.userdetails.UserDetails) org.springframework.security.core.context.SecurityContextHolder
@@ -70,7 +75,19 @@ public class DriveController {
         User currentUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
         drive.setCreatedBy(currentUser);
-        return driveRepository.save(drive);
+        PlacementDrive savedDrive = driveRepository.save(drive);
+
+        // Fetch all student emails and send alert
+        List<String> studentEmails = userRepository.findAll().stream()
+                .filter(u -> u.getRole() == com.elevateconnect.model.Role.STUDENT)
+                .map(com.elevateconnect.model.User::getEmail)
+                .toList();
+
+        if (!studentEmails.isEmpty()) {
+            emailService.sendDriveAlert(studentEmails, drive.getCompanyName(), drive.getRole());
+        }
+
+        return savedDrive;
     }
 
     @PutMapping("/{id}")

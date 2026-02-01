@@ -64,6 +64,14 @@ public class AuthController {
             // We need the actual User entity to get extra fields like branch, cgpa
             User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
+            // RESTRICT TPO/ADMIN LOGIN TO SPECIFIC EMAIL
+            if ((user.getRole() == com.elevateconnect.model.Role.ADMIN
+                    || user.getRole() == com.elevateconnect.model.Role.TPO)
+                    && !user.getEmail().equals("econnectelevate@gmail.com")) {
+                return ResponseEntity.status(403).body(new MessageResponse(
+                        "Error: Link Access Denied. You are not authorized to login as Administrator."));
+            }
+
             return ResponseEntity.ok(new JwtResponse(
                     jwt,
                     user.getId(),
@@ -146,6 +154,15 @@ public class AuthController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // BLOCK TPO/ADMIN REGISTRATION
+        if (signUpRequest.getRole() == com.elevateconnect.model.Role.ADMIN
+                || signUpRequest.getRole() == com.elevateconnect.model.Role.TPO) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse(
+                            "Error: Registration for Admin/TPO is restricted. Contact system administrator."));
         }
 
         // Create new user's account

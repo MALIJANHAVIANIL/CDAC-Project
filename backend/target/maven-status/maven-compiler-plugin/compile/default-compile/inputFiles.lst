@@ -9,6 +9,7 @@ C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\jav
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\controller\ChatController.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\model\ApprovalStatus.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\dto\ChatPartnerDTO.java
+C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\service\EmailService.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\controller\TPOController.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\model\Question.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\dto\LoginRequest.java
@@ -27,6 +28,7 @@ C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\jav
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\dto\JwtResponse.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\model\Course.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\config\WebConfig.java
+C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\config\AdminSeeder.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\ElevateConnectApplication.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\repository\PlacementDriveRepository.java
 C:\Users\patil\OneDrive\Desktop\ElevateConnect\CDAC-Project\backend\src\main\java\com\elevateconnect\model\AccountStatus.java
