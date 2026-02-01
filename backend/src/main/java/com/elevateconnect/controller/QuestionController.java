@@ -23,6 +23,9 @@ public class QuestionController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private com.elevateconnect.service.NotificationService notificationService;
+
     @GetMapping
     public ResponseEntity<List<Question>> getAllQuestions(
             @RequestParam(required = false) String company,
@@ -50,10 +53,23 @@ public class QuestionController {
 
     @PostMapping("/{id}/helpful")
     public ResponseEntity<?> markHelpful(@PathVariable Long id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        Long userId = user.getId();
+
         return questionRepository.findById(id).map(q -> {
-            q.setHelpfulCount(q.getHelpfulCount() + 1);
+            if (q.getUser().getId().equals(userId)) {
+                return ResponseEntity.badRequest().body("You cannot like your own question");
+            }
+            if (q.getLikedByUsers().contains(userId)) {
+                q.getLikedByUsers().remove(userId);
+                q.setHelpfulCount(Math.max(0, q.getHelpfulCount() - 1));
+            } else {
+                q.getLikedByUsers().add(userId);
+                q.setHelpfulCount(q.getHelpfulCount() + 1);
+            }
             questionRepository.save(q);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(q);
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -72,6 +88,12 @@ public class QuestionController {
 
         question.setUser(user);
         Question savedQuestion = questionRepository.save(question);
+
+        notificationService.notifyAllStudents(
+                "New Interview Question: " + (user.getName() != null ? user.getName() : "Alumni")
+                        + " shared a question for " + savedQuestion.getCompany(),
+                "INFO");
+
         return ResponseEntity.ok(savedQuestion);
     }
 

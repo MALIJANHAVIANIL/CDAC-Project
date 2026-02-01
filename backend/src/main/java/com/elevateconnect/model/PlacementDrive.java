@@ -61,6 +61,10 @@ public class PlacementDrive {
     @Column(columnDefinition = "TEXT")
     private String rejectionReason;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

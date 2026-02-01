@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Zap, BarChart, GraduationCap, Users, TrendingUp, Bell, CheckCircle, ArrowRight, Play } from 'lucide-react';
 
+import logo from '../assets/logo.png';
+
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState({
@@ -192,9 +194,9 @@ const LandingPage: React.FC = () => {
                     </div>
                     <div className="flex-1 relative group">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
-                        <div className="relative w-full aspect-square bg-[#1a1a20] rounded-[40px] border border-white/10 flex items-center justify-center text-8xl overflow-hidden shadow-2xl">
+                        <div className="relative w-full aspect-square bg-[#1a1a20] rounded-[40px] border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.1),transparent)]" />
-                            🚀
+                            <img src={logo} alt="ElevateConnect" className="w-[70%] h-auto relative z-10" />
                         </div>
                     </div>
                 </div>

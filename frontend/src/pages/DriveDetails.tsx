@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useParams, useNavigate } from 'react-router-dom'; // Added useParams and useNavigate
 import { getActiveDrives, applyForDrive } from '../services/driveService';
 import { useUser } from '../context/UserContext';
 
@@ -11,6 +11,12 @@ const DriveDetails: React.FC = () => {
     const [drive, setDrive] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [applying, setApplying] = useState(false);
+    const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+    const showNotification = (message: string, type: 'success' | 'error') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3000);
+    };
 
     useEffect(() => {
         const fetchDrive = async () => {
@@ -32,10 +38,10 @@ const DriveDetails: React.FC = () => {
         setApplying(true);
         try {
             await applyForDrive(parseInt(user.id), drive.id);
-            alert('Application successful!');
-            navigate('/applications');
+            showNotification('Application successful! 🚀', 'success');
+            setTimeout(() => navigate('/applications'), 1500);
         } catch (err: any) {
-            alert(err.message || 'Failed to apply');
+            showNotification(err.message || 'Failed to apply', 'error');
         } finally {
             setApplying(false);
         }
@@ -124,7 +130,7 @@ const DriveDetails: React.FC = () => {
                             <button
                                 onClick={handleApply}
                                 disabled={drive.status === 'Applied' || applying}
-                                className={`w-full py-5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-white shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all uppercase tracking-wider ${drive.status === 'Applied' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`w - full py - 5 bg - gradient - to - r from - purple - 600 to - blue - 600 rounded - 2xl font - black text - white shadow - xl shadow - purple - 500 / 20 hover: shadow - purple - 500 / 40 hover: -translate - y - 1 active: translate - y - 0 transition - all uppercase tracking - wider ${drive.status === 'Applied' ? 'opacity-50 cursor-not-allowed' : ''} `}
                             >
                                 {applying ? 'Processing...' : (drive.status === 'Applied' ? 'Already Applied' : 'Confirm Application')}
                             </button>
@@ -132,6 +138,36 @@ const DriveDetails: React.FC = () => {
                     </div>
                 </div>
             </motion.div>
+
+            {/* Notifications */}
+            <AnimatePresence>
+                {notification && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                        className={`fixed bottom - 8 right - 8 z - [200] px - 6 py - 4 rounded - 2xl shadow - 2xl border flex items - center gap - 3 font - bold backdrop - blur - xl ${notification.type === 'success'
+                            ? 'bg-green-500/10 border-green-500/20 text-green-400 shadow-green-500/10'
+                            : 'bg-red-500/10 border-red-500/20 text-red-400 shadow-red-500/10'
+                            } `}
+                    >
+                        <div className={`w - 8 h - 8 rounded - xl flex items - center justify - center ${notification.type === 'success' ? 'bg-green-500/20' : 'bg-red-500/20'} `}>
+                            {notification.type === 'success' ? (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            ) : (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            )}
+                        </div>
+                        {notification.message}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

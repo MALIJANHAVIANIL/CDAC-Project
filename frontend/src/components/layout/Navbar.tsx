@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 
+import logo from '../../assets/logo.png';
+
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const { user, logout } = useUser();
@@ -19,8 +21,11 @@ const Navbar: React.FC = () => {
 
     return (
         <nav className="sticky top-0 z-[100] px-[6%] py-5 bg-[#0a0a0fcc] backdrop-blur-[16px] border-b border-white/10 flex justify-between items-center">
-            <Link to="/" className="text-2xl font-extrabold bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent no-underline">
-                ElevateConnect
+            <Link to="/" className="flex items-center gap-3 text-2xl font-extrabold no-underline">
+                <img src={logo} alt="ElevateConnect" className="h-10 w-auto" />
+                <span className="bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent">
+                    ElevateConnect
+                </span>
             </Link>
 
             <ul className="hidden md:flex gap-8 items-center list-none">

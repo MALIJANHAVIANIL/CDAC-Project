@@ -15,4 +15,8 @@ public class JwtResponse {
     private Double cgpa;
     private String studentId;
     private String resumeUrl;
+    private Integer backlogs;
+    private Double attendance;
+    private Double tenthMarks;
+    private Double twelfthMarks;
 }

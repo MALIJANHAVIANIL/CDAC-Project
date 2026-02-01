@@ -26,6 +26,9 @@ public class TPOController {
     UserRepository userRepository;
 
     @Autowired
+    private com.elevateconnect.service.NotificationService notificationService;
+
+    @Autowired
     CourseRepository courseRepository;
 
     @Autowired
@@ -55,6 +58,10 @@ public class TPOController {
         drive.setReviewedBy(tpo);
         drive.setReviewedAt(LocalDateTime.now());
         driveRepository.save(drive);
+
+        notificationService.notifyAllStudents(
+                "New Drive: " + drive.getCompanyName() + " - " + drive.getRole() + " posted.",
+                "INFO");
 
         return ResponseEntity.ok(new MessageResponse("Drive approved successfully!"));
     }

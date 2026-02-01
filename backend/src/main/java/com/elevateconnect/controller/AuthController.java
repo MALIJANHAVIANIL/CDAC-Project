@@ -73,7 +73,11 @@ public class AuthController {
                     user.getBranch(),
                     user.getCgpa(),
                     user.getStudentId(),
-                    user.getResumeUrl()));
+                    user.getResumeUrl(),
+                    user.getBacklogs(),
+                    user.getAttendance(),
+                    user.getTenthMarks(),
+                    user.getTwelfthMarks()));
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
             // Distinguish between empty DB (User not found) and wrong password?
             // Spring Security's DaoAuthenticationProvider throws BadCredentialsException
@@ -104,6 +108,14 @@ public class AuthController {
             user.setStudentId(updateRequest.getStudentId());
         if (updateRequest.getResumeUrl() != null)
             user.setResumeUrl(updateRequest.getResumeUrl());
+        if (updateRequest.getBacklogs() != null)
+            user.setBacklogs(updateRequest.getBacklogs());
+        if (updateRequest.getAttendance() != null)
+            user.setAttendance(updateRequest.getAttendance());
+        if (updateRequest.getTenthMarks() != null)
+            user.setTenthMarks(updateRequest.getTenthMarks());
+        if (updateRequest.getTwelfthMarks() != null)
+            user.setTwelfthMarks(updateRequest.getTwelfthMarks());
 
         // Optional: Update password if provided
         if (updateRequest.getPassword() != null && !updateRequest.getPassword().isEmpty()) {
@@ -121,7 +133,11 @@ public class AuthController {
                 user.getBranch(),
                 user.getCgpa(),
                 user.getStudentId(),
-                user.getResumeUrl()));
+                user.getResumeUrl(),
+                user.getBacklogs(),
+                user.getAttendance(),
+                user.getTenthMarks(),
+                user.getTwelfthMarks()));
     }
 
     @PostMapping("/signup")

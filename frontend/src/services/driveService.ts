@@ -5,6 +5,11 @@ export const getActiveDrives = async () => {
     return response.json();
 };
 
+export const getAllDrives = async () => {
+    const response = await fetchWithAuth('/drives/all');
+    return response.json();
+};
+
 export const applyForDrive = async (userId: number, driveId: number) => {
     const response = await fetchWithAuth(`/applications/apply?userId=${userId}&driveId=${driveId}`, {
         method: 'POST'
@@ -26,6 +31,15 @@ export const deleteDrive = async (id: number) => {
 export const createDrive = async (driveData: any) => {
     const response = await fetchWithAuth('/drives', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(driveData)
+    });
+    return response.json();
+};
+
+export const updateDrive = async (id: number, driveData: any) => {
+    const response = await fetchWithAuth(`/drives/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(driveData)
     });

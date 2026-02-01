@@ -4,7 +4,7 @@ export interface Notification {
     id: number;
     message: string;
     type: string;
-    read: boolean;
+    isRead: boolean; // Match backend naming or handle both
     createdAt: string;
 }
 
@@ -15,6 +15,12 @@ export const getNotifications = async (): Promise<Notification[]> => {
 
 export const markAsRead = async (id: number) => {
     await fetchWithAuth(`/notifications/${id}/read`, {
+        method: 'PUT',
+    });
+};
+
+export const markAllAsRead = async () => {
+    await fetchWithAuth('/notifications/read-all', {
         method: 'PUT',
     });
 };

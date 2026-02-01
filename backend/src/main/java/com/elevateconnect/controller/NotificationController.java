@@ -28,23 +28,8 @@ public class NotificationController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
-        // Auto-generate some dummy notifications if empty (for demo)
         List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
-        if (notifications.isEmpty()) {
-            createDemoNotification(user, "Profile Complete", "You reached 85% profile completion!", "SUCCESS");
-            createDemoNotification(user, "New Drive: Google", "Software Engineer Role posted.", "ALERT");
-            notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
-        }
-
         return ResponseEntity.ok(notifications);
-    }
-
-    private void createDemoNotification(User user, String title, String message, String type) {
-        Notification n = new Notification();
-        n.setUser(user);
-        n.setMessage(title + ": " + message);
-        n.setType(type);
-        notificationRepository.save(n);
     }
 
     @PutMapping("/{id}/read")
@@ -52,6 +37,15 @@ public class NotificationController {
         Notification notification = notificationRepository.findById(id).orElseThrow();
         notification.setRead(true);
         notificationRepository.save(notification);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/read-all")
+    public ResponseEntity<?> markAllAsRead() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+
+        notificationRepository.markAllAsRead(user.getId());
         return ResponseEntity.ok().build();
     }
 }

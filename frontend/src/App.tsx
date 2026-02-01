@@ -140,6 +140,11 @@ function App() {
                                 <HrDashboard />
                             </ProtectedRoute>
                         } />
+                        <Route path="/hr/jobs" element={
+                            <ProtectedRoute role="HR">
+                                <HrDashboard />
+                            </ProtectedRoute>
+                        } />
 
                         {/* Chat - accessible to Students and Alumni */}
                         <Route path="/chat" element={

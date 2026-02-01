@@ -59,6 +59,11 @@ public class User {
     @JoinTable(name = "user_courses", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     private java.util.Set<Course> assignedCourses = new java.util.HashSet<>();
 
+    private Integer backlogs = 0;
+    private Double attendance;
+    private Double tenthMarks;
+    private Double twelfthMarks;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

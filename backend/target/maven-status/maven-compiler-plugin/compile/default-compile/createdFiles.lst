@@ -19,6 +19,7 @@ com\elevateconnect\ElevateConnectApplication.class
 com\elevateconnect\repository\UserRepository.class
 com\elevateconnect\controller\NotificationController.class
 com\elevateconnect\model\ApplicationStatus.class
+com\elevateconnect\service\NotificationService.class
 com\elevateconnect\dto\MessageResponse.class
 com\elevateconnect\model\Notification.class
 com\elevateconnect\repository\PlacementDriveRepository.class
@@ -32,6 +33,7 @@ com\elevateconnect\config\AuthEntryPointJwt.class
 com\elevateconnect\repository\ApplicationRepository.class
 com\elevateconnect\model\Course.class
 com\elevateconnect\repository\CourseRepository.class
+com\elevateconnect\config\WebConfig.class
 com\elevateconnect\model\AccountStatus.class
 com\elevateconnect\model\Application.class
 com\elevateconnect\repository\ChatRepository.class

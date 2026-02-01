@@ -9,7 +9,6 @@ import { Bell, Briefcase, CheckCircle, Clock, FileText, Search, Star, TrendingUp
 const Dashboard: React.FC = () => {
     const { user } = useUser();
     const navigate = useNavigate();
-    const [applications, setApplications] = useState<any[]>([]);
     const [upcomingDrives, setUpcomingDrives] = useState<any[]>([]);
     const [stats, setStats] = useState({ applied: 0, interviews: 0, offers: 0, rejected: 0 });
     const [profileCompleteness, setProfileCompleteness] = useState(0);
@@ -41,7 +40,7 @@ const Dashboard: React.FC = () => {
                 try {
                     const userId = user.id ? parseInt(user.id) : (user as any)._id;
                     const apps = await getUserApplications(userId);
-                    setApplications(apps || []);
+                    // setApplications(apps || []); // Removed as unused
 
                     // Calculate Stats
                     const statsCount = { applied: 0, interviews: 0, offers: 0, rejected: 0 };
@@ -85,7 +84,17 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    const handleMarkAllRead = async () => {
+        try {
+            const { markAllAsRead } = await import('../services/notificationService');
+            await markAllAsRead();
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        } catch (e) {
+            console.error("Failed to mark all as read", e);
+        }
+    };
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const statCards = [
         { title: 'Applied', value: stats.applied, icon: <FileText size={20} />, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-500/10 text-blue-400' },
@@ -105,7 +114,7 @@ const Dashboard: React.FC = () => {
                         <h1 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
                             Dashboard
                         </h1>
-                        <p className="text-xs text-white/40">Welcome back, {user?.name?.split(' ')[0]}</p>
+                        <p className="text-xs text-white/40">Welcome back, {user?.name?.split(' ')[0] || 'Student'}</p>
                     </div>
 
                     <div className="flex items-center gap-4 relative">
@@ -134,18 +143,27 @@ const Dashboard: React.FC = () => {
                             <div className="absolute top-16 right-20 w-80 bg-[#1a1a24] border border-white/10 rounded-2xl shadow-xl z-[100] overflow-hidden">
                                 <div className="p-4 border-b border-white/10 flex justify-between items-center">
                                     <h3 className="font-bold text-sm">Notifications</h3>
-                                    <button className="text-xs text-purple-400 hover:text-purple-300">Mark all read</button>
+                                    <button
+                                        onClick={handleMarkAllRead}
+                                        className="text-xs text-purple-400 hover:text-purple-300"
+                                    >
+                                        Mark all read
+                                    </button>
                                 </div>
                                 <div className="max-h-[300px] overflow-y-auto">
                                     {notifications.length === 0 ? (
                                         <div className="p-8 text-center text-white/30 text-xs">No notifications</div>
                                     ) : (
                                         notifications.map((n, i) => (
-                                            <div key={i} className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer ${!n.read ? 'bg-white/5' : ''}`} onClick={() => handleMarkRead(n.id)}>
+                                            <div
+                                                key={i}
+                                                className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer ${!n.isRead ? 'bg-white/10' : ''}`}
+                                                onClick={() => handleMarkRead(n.id)}
+                                            >
                                                 <div className="flex gap-3">
                                                     <div className="text-lg">{n.type === 'ALERT' ? '🚀' : '📢'}</div>
                                                     <div>
-                                                        <p className="text-xs font-semibold text-white/90">{n.message}</p>
+                                                        <p className={`text-xs ${!n.isRead ? 'font-bold text-white' : 'text-white/60'}`}>{n.message}</p>
                                                         <p className="text-[10px] text-white/40 mt-1">{new Date(n.createdAt || Date.now()).toLocaleString()}</p>
                                                     </div>
                                                 </div>
@@ -264,6 +282,35 @@ const Dashboard: React.FC = () => {
                                 )}
                             </div>
 
+                            {/* Recent Activity Feed */}
+                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                    <Clock size={20} className="text-blue-400" />
+                                    Recent Activity
+                                </h3>
+
+                                <div className="space-y-6 relative ml-2">
+                                    {/* Timeline Line */}
+                                    <div className="absolute left-[19px] top-2 bottom-2 w-[2px] bg-white/5"></div>
+
+                                    {notifications.length > 0 ? notifications.slice(0, 4).map((n, i) => (
+                                        <div key={i} className="relative flex gap-6 group">
+                                            {/* Timeline Dot */}
+                                            <div className="w-10 h-10 rounded-full bg-[#0a0a0f] border-2 border-white/10 group-hover:border-blue-500 flex items-center justify-center z-10 transition-colors">
+                                                {n.type === 'ALERT' ? <Bell size={14} className="text-orange-400" /> : <FileText size={14} className="text-blue-400" />}
+                                            </div>
+
+                                            <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all">
+                                                <p className="text-sm font-medium text-white/90">{n.message}</p>
+                                                <p className="text-xs text-white/40 mt-1">{new Date(n.createdAt || Date.now()).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <div className="text-center py-8 text-white/30 text-sm">No recent activity</div>
+                                    )}
+                                </div>
+                            </div>
+
                         </div>
 
                         {/* Right Column (4 cols) */}
@@ -300,39 +347,70 @@ const Dashboard: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Placement Eligibility */}
+                            {/* Placement Eligibility (Detailed) */}
                             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
                                 <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
                                     <CheckCircle size={18} className="text-green-400" />
-                                    Eligibility
+                                    Eligibility Status
                                 </h3>
 
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="relative w-20 h-20 flex items-center justify-center">
-                                        <svg className="w-full h-full -rotate-90">
-                                            <circle cx="40" cy="40" r="36" className="stroke-white/10 fill-none" strokeWidth="8" />
-                                            <circle
-                                                cx="40" cy="40" r="36"
-                                                className="stroke-purple-500 fill-none transition-all duration-1000"
-                                                strokeWidth="8"
-                                                strokeDasharray="226"
-                                                strokeDashoffset={226 - (226 * (user?.cgpa || 0) / 10)}
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                            <span className="text-xl font-bold">{user?.cgpa || 0}</span>
-                                            <span className="text-[8px] text-white/50 uppercase">CGPA</span>
+                                <div className="space-y-4">
+                                    {/* CGPA */}
+                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                                                <TrendingUp size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-bold text-white">CGPA</div>
+                                                <div className="text-[10px] text-white/40">Min 6.0 Required</div>
+                                            </div>
+                                        </div>
+                                        <div className={`text-sm font-bold ${(user?.cgpa || 0) >= 6.0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            {user?.cgpa || 'N/A'}
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="text-sm font-semibold">Academic Score</div>
-                                        <div className="text-xs text-white/50 w-32">
-                                            {(user?.cgpa || 0) >= 6.5
-                                                ? 'You meet most placement criteria!'
-                                                : 'Work on improving your CGPA for better opportunities.'}
+
+                                    {/* Backlogs */}
+                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-red-500/20 rounded-lg text-red-400">
+                                                <XCircle size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-bold text-white">Active Backlogs</div>
+                                                <div className="text-[10px] text-white/40">Must be 0</div>
+                                            </div>
+                                        </div>
+                                        <div className={`text-sm font-bold ${(user?.backlogs || 0) === 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            {user?.backlogs || 0}
                                         </div>
                                     </div>
+
+                                    {/* Attendance */}
+                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-yellow-500/20 rounded-lg text-yellow-400">
+                                                <Clock size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-bold text-white">Attendance</div>
+                                                <div className="text-[10px] text-white/40">Min 75% Required</div>
+                                            </div>
+                                        </div>
+                                        <div className={`text-sm font-bold ${(user?.attendance || 0) >= 75 ? 'text-green-400' : 'text-orange-400'}`}>
+                                            {user?.attendance || 0}%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                                    <p className="text-xs text-white/50">
+                                        {((user?.cgpa || 0) >= 6.0 && (user?.backlogs || 0) === 0 && (user?.attendance || 0) >= 75)
+                                            ? <span className="text-green-400 font-bold">You are eligible for placements! 🎉</span>
+                                            : <span className="text-orange-400 font-bold">Review criteria to improve eligibility.</span>
+                                        }
+                                    </p>
                                 </div>
                             </div>
 

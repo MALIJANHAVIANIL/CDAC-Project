@@ -28,6 +28,9 @@ public class Chat {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
 
+    private String mediaUrl;
+    private String mediaType;
+
     @Column(nullable = false)
     private boolean isRead = false;
 

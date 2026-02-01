@@ -1,4 +1,3 @@
-import { fetchWithAuth } from './api';
 // Generic fetch without auth header for login/signup
 const publicFetch = async (endpoint: string, options: RequestInit = {}) => {
     const BASE_URL = 'http://localhost:8089/api'; // Hardcoded for safety or import from api.ts if exported

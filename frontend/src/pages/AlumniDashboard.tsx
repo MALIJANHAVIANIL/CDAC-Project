@@ -104,18 +104,60 @@ const AlumniDashboard: React.FC = () => {
                         >
                             💬 Messages
                         </button>
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold uppercase">
+                        <div
+                            onClick={() => navigate('/profile')}
+                            className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] rounded-xl flex items-center justify-center font-bold uppercase cursor-pointer hover:scale-110 transition-transform"
+                        >
                             {user?.name?.substring(0, 2) || 'AL'}
                         </div>
                     </div>
                 </header>
 
                 <div className="p-8">
-                    {/* Stats */}
+                    {/* Welcome Banner */}
+                    <div className="mb-8 p-8 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-[32px] border border-white/10 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(139,92,246,0.3),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-[30px] flex items-center justify-center text-4xl font-bold shadow-2xl shadow-purple-500/20 cursor-pointer hover:scale-105 transition-transform"
+                            >
+                                {user?.name?.substring(0, 1) || 'A'}
+                            </div>
+                            <div className="flex-1">
+                                <h1 className="text-3xl font-bold mb-2">Welcome Back, {user?.name || 'Alumni'}! 👋</h1>
+                                <p className="text-white/60 text-lg">You've reached more than <span className="text-purple-400 font-bold">{questions.reduce((acc, q) => acc + q.helpfulCount, 0)} students</span> through your contributions.</p>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                <div className="text-xs text-white/40 uppercase font-bold tracking-widest mb-1">Status</div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                    <span className="font-semibold text-green-400 capitalize">Elite Mentor</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <StatCard icon="📝" label="Questions Contributed" value={questions.length} />
-                        <StatCard icon="👥" label="Students Helped" value={recentChats.length} />
-                        <StatCard icon="⭐" label="Total Helpful Votes" value={questions.reduce((acc, q) => acc + q.helpfulCount, 0)} />
+                        <StatCard
+                            icon="📝"
+                            label="Questions Shared"
+                            value={questions.length}
+                            color="purple"
+                        />
+                        <StatCard
+                            icon="💬"
+                            label="Students Mentored"
+                            value={recentChats.length}
+                            color="blue"
+                        />
+                        <StatCard
+                            icon="🔥"
+                            label="Influence Score"
+                            value={questions.filter(q => q.helpfulCount > 0).length * 10 + questions.reduce((acc, q) => acc + q.helpfulCount, 0)}
+                            color="orange"
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -286,15 +328,20 @@ const AlumniDashboard: React.FC = () => {
     );
 };
 
-const StatCard = ({ icon, label, value }: { icon: string; label: string; value: number }) => (
+const StatCard = ({ icon, label, value, color }: { icon: string; label: string; value: number; color: string }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-[20px] p-6 hover:border-purple-500/30 transition-all"
+        className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-[24px] p-6 hover:border-white/20 transition-all relative group overflow-hidden"
     >
-        <div className="text-3xl mb-3">{icon}</div>
-        <div className="text-3xl font-bold mb-1">{value}</div>
-        <div className="text-sm text-white/50">{label}</div>
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform ${color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
+            color === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                'bg-orange-500/20 text-orange-400'
+            }`}>
+            {icon}
+        </div>
+        <div className="text-4xl font-bold mb-1">{value}</div>
+        <div className="text-sm text-white/50 font-medium">{label}</div>
     </motion.div>
 );
 

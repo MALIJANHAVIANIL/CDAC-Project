@@ -6,4 +6,6 @@ import lombok.Data;
 public class ChatRequest {
     private Long receiverId;
     private String message;
+    private String mediaUrl;
+    private String mediaType;
 }

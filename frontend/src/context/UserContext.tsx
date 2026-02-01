@@ -9,6 +9,11 @@ interface User {
     cgpa?: number;
     studentId?: string;
     resumeUrl?: string;
+    phone?: string;
+    backlogs?: number;
+    attendance?: number;
+    tenthMarks?: number;
+    twelfthMarks?: number;
 }
 
 interface UserContextType {
