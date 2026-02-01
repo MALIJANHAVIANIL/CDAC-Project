@@ -7,17 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -52,28 +48,37 @@ public class FileController {
                     .getPrincipal();
             User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
-            // Normalize file name
-            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
-            String fileName = UUID.randomUUID().toString() + "_" + originalFileName;
+            // Convert to Base64
+            String contentType = file.getContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                contentType = "application/pdf"; // Default to PDF for resumes
+            }
 
-            // Copy file to the target location (Replacing existing file with the same name)
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            String base64Content = java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            // Create Data URI: data:[<mediatype>][;base64],<data>
+            String dataUri = "data:" + contentType + ";base64," + base64Content;
 
-            // Build download URI
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/api/files/download/")
-                    .path(fileName)
-                    .toUriString();
-
-            // Save to user profile
-            user.setResumeUrl(fileDownloadUri);
+            // Save Base64 string to database
+            user.setResumeData(dataUri);
             userRepository.save(user);
+            System.out.println(">>> RESUME UPLOAD: Saved " + file.getOriginalFilename() + " as Base64 ("
+                    + dataUri.length() + " chars)");
 
-            return ResponseEntity.ok(new MessageResponse(fileDownloadUri));
+            return ResponseEntity.ok(new MessageResponse(dataUri));
         } catch (IOException ex) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Could not store file. Please try again!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Could not process file. Please try again!"));
         }
+    }
+
+    @DeleteMapping("/delete/resume")
+    public ResponseEntity<?> deleteResume() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+
+        user.setResumeData(null);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("Resume removed successfully!"));
     }
 
     @GetMapping("/download/{fileName:.+}")

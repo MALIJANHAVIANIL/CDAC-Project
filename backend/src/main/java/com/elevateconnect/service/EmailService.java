@@ -20,6 +20,8 @@ public class EmailService {
 
     @Async
     public void sendDriveAlert(List<String> recipients, String companyName, String role) {
+        System.out.println(">>> EMAIL SERVICE: Attempting to send emails to " + recipients.size() + " recipients");
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
         message.setSubject("New Placement Drive Alert: " + companyName);
@@ -35,11 +37,16 @@ public class EmailService {
         // In production, BCC or batch sending is better, but this is simple for now
         for (String recipient : recipients) {
             try {
+                System.out.println(">>> EMAIL SERVICE: Sending to " + recipient);
                 message.setTo(recipient);
                 javaMailSender.send(message);
+                System.out.println(">>> EMAIL SERVICE: Successfully sent to " + recipient);
             } catch (Exception e) {
-                System.err.println("Failed to send email to: " + recipient + " Error: " + e.getMessage());
+                System.err.println(
+                        ">>> EMAIL SERVICE ERROR: Failed to send email to: " + recipient + " Error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
+        System.out.println(">>> EMAIL SERVICE: Finished sending all emails");
     }
 }

@@ -77,14 +77,22 @@ public class DriveController {
         drive.setCreatedBy(currentUser);
         PlacementDrive savedDrive = driveRepository.save(drive);
 
+        System.out.println(">>> DRIVE CREATED: " + drive.getCompanyName() + " by " + currentUser.getEmail());
+
         // Fetch all student emails and send alert
         List<String> studentEmails = userRepository.findAll().stream()
                 .filter(u -> u.getRole() == com.elevateconnect.model.Role.STUDENT)
                 .map(com.elevateconnect.model.User::getEmail)
                 .toList();
 
+        System.out.println(">>> FOUND STUDENTS: " + studentEmails.size() + " students");
+        System.out.println(">>> STUDENT EMAILS: " + studentEmails);
+
         if (!studentEmails.isEmpty()) {
+            System.out.println(">>> TRIGGERING EMAIL SERVICE...");
             emailService.sendDriveAlert(studentEmails, drive.getCompanyName(), drive.getRole());
+        } else {
+            System.out.println(">>> NO STUDENTS FOUND - EMAIL NOT SENT");
         }
 
         return savedDrive;

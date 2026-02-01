@@ -6,7 +6,6 @@ import {
     PieChart,
     MessageSquare,
     User,
-    GraduationCap,
     BookOpen,
     LogOut,
     CheckSquare
@@ -79,10 +78,10 @@ const Sidebar = () => {
     return (
         <aside className="w-20 bg-[#0a0a0f]/80 backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-8 fixed h-full z-[100] shadow-2xl">
             <div
-                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#3b82f6] flex items-center justify-center text-xl font-black text-white mb-12 cursor-pointer shadow-lg shadow-purple-500/20 hover:scale-110 active:scale-95 transition-all"
+                className="w-12 h-12 rounded-2xl bg-[#12121a] border border-white/10 flex items-center justify-center p-1 cursor-pointer hover:scale-110 active:scale-95 transition-all overflow-hidden mb-12"
                 onClick={() => navigate(getHomeRoute())}
             >
-                E
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <nav className="flex flex-col gap-6 flex-1">
                 {getNavItems().map((item) => (

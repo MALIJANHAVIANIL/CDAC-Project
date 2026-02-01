@@ -38,6 +38,13 @@ const Auth: React.FC = () => {
         { id: 'HR', label: 'HR' }
     ];
 
+    // Force login mode for TPO/Admin
+    useEffect(() => {
+        if (selectedRole === 'TPO' || selectedRole === 'ADMIN') {
+            setIsLogin(true);
+        }
+    }, [selectedRole]);
+
     const benefits = [
         { icon: '⚡', title: 'Track Placements' },
         { icon: '🤝', title: 'Alumni Network' },
@@ -145,6 +152,13 @@ const Auth: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white/5 backdrop-blur-[40px] border border-white/10 rounded-[40px] p-8 md:p-12 shadow-2xl relative overflow-hidden"
                 >
+                    {/* Brand Logo */}
+                    <div className="flex justify-center mb-8">
+                        <div className="w-16 h-16 rounded-2xl bg-[#12121a] border border-white/10 flex items-center justify-center p-2 shadow-2xl overflow-hidden group hover:scale-110 transition-transform">
+                            <img src="/logo.png" alt="ElevateConnect Logo" className="w-full h-full object-contain" />
+                        </div>
+                    </div>
+
                     {/* Role Tabs */}
                     <div className="flex p-1 bg-white/5 rounded-2xl border border-white/5 mb-8">
                         {roles.map((role) => (
@@ -161,21 +175,29 @@ const Auth: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Mode Switcher */}
-                    <div className="flex gap-8 mb-10 justify-center">
-                        <button
-                            onClick={() => setIsLogin(true)}
-                            className={`text-2xl font-black pb-2 transition-all ${isLogin ? 'text-white border-b-4 border-purple-500' : 'text-white/20 hover:text-white/40'}`}
-                        >
-                            Login
-                        </button>
-                        <button
-                            onClick={() => setIsLogin(false)}
-                            className={`text-2xl font-black pb-2 transition-all ${!isLogin ? 'text-white border-b-4 border-purple-500' : 'text-white/20 hover:text-white/40'}`}
-                        >
-                            Register
-                        </button>
-                    </div>
+                    {/* Mode Switcher - Hidden for TPO/ADMIN */}
+                    {selectedRole !== 'TPO' && selectedRole !== 'ADMIN' ? (
+                        <div className="flex gap-8 mb-10 justify-center">
+                            <button
+                                onClick={() => setIsLogin(true)}
+                                className={`text-2xl font-black pb-2 transition-all ${isLogin ? 'text-white border-b-4 border-purple-500' : 'text-white/20 hover:text-white/40'}`}
+                            >
+                                Login
+                            </button>
+                            <button
+                                onClick={() => setIsLogin(false)}
+                                className={`text-2xl font-black pb-2 transition-all ${!isLogin ? 'text-white border-b-4 border-purple-500' : 'text-white/20 hover:text-white/40'}`}
+                            >
+                                Register
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="mb-10 text-center">
+                            <h2 className="text-2xl font-black text-white border-b-4 border-purple-500 inline-block pb-2">
+                                Admin Login
+                            </h2>
+                        </div>
+                    )}
 
                     {/* Error/Success Msg */}
                     {error && (

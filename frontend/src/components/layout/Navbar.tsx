@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 
-import logo from '../../assets/logo.png';
+const logo = "/logo.png";
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();

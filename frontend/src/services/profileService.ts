@@ -21,3 +21,10 @@ export const uploadResume = async (file: File) => {
     });
     return response.json();
 };
+
+export const deleteResume = async () => {
+    const response = await fetchWithAuth('/files/delete/resume', {
+        method: 'DELETE',
+    });
+    return response.json();
+};

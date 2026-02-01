@@ -53,7 +53,8 @@ public class User {
     @Column(unique = true)
     private String studentId;
 
-    private String resumeUrl;
+    @Column(columnDefinition = "LONGTEXT")
+    private String resumeData;
 
     @ManyToMany
     @JoinTable(name = "user_courses", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))

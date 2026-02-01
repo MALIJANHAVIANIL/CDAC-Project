@@ -81,7 +81,7 @@ public class AuthController {
                     user.getBranch(),
                     user.getCgpa(),
                     user.getStudentId(),
-                    user.getResumeUrl(),
+                    user.getResumeData(),
                     user.getBacklogs(),
                     user.getAttendance(),
                     user.getTenthMarks(),
@@ -112,10 +112,9 @@ public class AuthController {
         user.setBranch(updateRequest.getBranch());
         user.setCgpa(updateRequest.getCgpa());
         user.setPhone(updateRequest.getPhone());
-        if (updateRequest.getStudentId() != null)
-            user.setStudentId(updateRequest.getStudentId());
+        // Student ID is READ-ONLY - cannot be changed by students
         if (updateRequest.getResumeUrl() != null)
-            user.setResumeUrl(updateRequest.getResumeUrl());
+            user.setResumeData(updateRequest.getResumeUrl());
         if (updateRequest.getBacklogs() != null)
             user.setBacklogs(updateRequest.getBacklogs());
         if (updateRequest.getAttendance() != null)
@@ -141,7 +140,7 @@ public class AuthController {
                 user.getBranch(),
                 user.getCgpa(),
                 user.getStudentId(),
-                user.getResumeUrl(),
+                user.getResumeData(),
                 user.getBacklogs(),
                 user.getAttendance(),
                 user.getTenthMarks(),

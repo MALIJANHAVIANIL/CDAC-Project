@@ -97,10 +97,10 @@ const Dashboard: React.FC = () => {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const statCards = [
-        { title: 'Applied', value: stats.applied, icon: <FileText size={20} />, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-500/10 text-blue-400' },
-        { title: 'Interviews', value: stats.interviews, icon: <Briefcase size={20} />, color: 'from-purple-500 to-pink-500', bg: 'bg-purple-500/10 text-purple-400' },
-        { title: 'Offers', value: stats.offers, icon: <CheckCircle size={20} />, color: 'from-green-500 to-emerald-500', bg: 'bg-green-500/10 text-green-400' },
-        { title: 'Rejected', value: stats.rejected, icon: <XCircle size={20} />, color: 'from-red-500 to-orange-500', bg: 'bg-red-500/10 text-red-400' },
+        { title: 'Applied', value: stats.applied, icon: <FileText size={20} />, color: 'from-blue-500 to-indigo-500', bg: 'bg-blue-500/10 text-blue-400', shadow: 'shadow-blue-500/10' },
+        { title: 'Interviews', value: stats.interviews, icon: <Briefcase size={20} />, color: 'from-purple-500 to-pink-500', bg: 'bg-purple-500/10 text-purple-400', shadow: 'shadow-purple-500/10' },
+        { title: 'Offers', value: stats.offers, icon: <CheckCircle size={20} />, color: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-500/10 text-emerald-400', shadow: 'shadow-emerald-500/10' },
+        { title: 'Rejected', value: stats.rejected, icon: <XCircle size={20} />, color: 'from-red-500 to-rose-500', bg: 'bg-red-500/10 text-red-400', shadow: 'shadow-red-500/10' },
     ];
 
     return (
@@ -189,22 +189,24 @@ const Dashboard: React.FC = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative overflow-hidden rounded-[32px] p-8 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-white/10"
+                        className="relative overflow-hidden rounded-[40px] p-10 bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0f] border border-white/10 shadow-2xl"
                     >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                        <div className="relative z-10 flex justify-between items-end">
-                            <div>
-                                <h2 className="text-3xl font-extrabold text-white mb-2">
-                                    Ready for your next big step? 🚀
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                            <div className="flex-1 text-center md:text-left">
+                                <h2 className="text-4xl font-black text-white mb-4 tracking-tighter">
+                                    Ready for your <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">next big step?</span> 🚀
                                 </h2>
-                                <p className="text-white/60 max-w-xl">
+                                <p className="text-white/40 text-lg max-w-xl font-medium leading-relaxed">
                                     You have applied to <span className="text-white font-bold">{stats.applied}</span> companies.
-                                    Keep your profile updated and stay consistent!
+                                    Keep your profile updated for better placement opportunities.
                                 </p>
                             </div>
                             <button
                                 onClick={() => navigate('/placements')}
-                                className="px-6 py-3 bg-white text-black font-bold rounded-xl hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105 transition-all"
+                                className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap"
                             >
                                 Browse Drives
                             </button>
@@ -219,16 +221,19 @@ const Dashboard: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-2xl hover:border-white/20 transition-all group"
+                                className={`bg-[#12121a] backdrop-blur-xl border border-white/5 p-6 rounded-[32px] hover:border-white/20 transition-all group shadow-2xl hover:shadow-2xl ${stat.shadow}`}
                             >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className={`p-2 rounded-lg ${stat.bg} group-hover:scale-110 transition-transform`}>
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} group-hover:scale-110 transition-transform shadow-lg`}>
                                         {stat.icon}
                                     </div>
-                                    <TrendingUp size={16} className="text-white/20 group-hover:text-green-400 transition-colors" />
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                                        <TrendingUp size={12} className="text-green-400" />
+                                        <span className="text-[10px] font-bold text-green-400">+12%</span>
+                                    </div>
                                 </div>
-                                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                                <div className="text-sm text-white/40 font-medium">{stat.title}</div>
+                                <div className="text-4xl font-black text-white mb-2 tracking-tighter">{stat.value}</div>
+                                <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">{stat.title}</div>
                             </motion.div>
                         ))}
                     </div>
@@ -240,73 +245,82 @@ const Dashboard: React.FC = () => {
                         <div className="lg:col-span-8 space-y-6">
 
                             {/* Upcoming Drives */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 min-h-[300px]">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-lg font-bold flex items-center gap-2">
-                                        <Briefcase size={20} className="text-purple-400" />
+                            <div className="bg-[#12121a] backdrop-blur-xl border border-white/5 rounded-[40px] p-8 min-h-[300px] shadow-2xl">
+                                <div className="flex justify-between items-center mb-8">
+                                    <h3 className="text-xl font-black flex items-center gap-3 tracking-tighter">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                                            <Briefcase size={20} className="text-purple-400" />
+                                        </div>
                                         Upcoming Drives
                                     </h3>
-                                    <button onClick={() => navigate('/placements')} className="text-xs text-white/40 hover:text-white transition-colors">
+                                    <button onClick={() => navigate('/placements')} className="px-4 py-2 bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all border border-white/5">
                                         View All
                                     </button>
                                 </div>
 
                                 {upcomingDrives.length > 0 ? (
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         {upcomingDrives.map((drive, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-white/3 hover:bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all group cursor-pointer" onClick={() => navigate('/placements')}>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center font-bold text-lg border border-white/10 group-hover:border-purple-500/50 transition-colors text-white">
+                                            <div
+                                                key={idx}
+                                                className="flex items-center justify-between p-6 rounded-[24px] bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 hover:border-purple-500/30 transition-all group cursor-pointer"
+                                                onClick={() => navigate('/placements')}
+                                            >
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0f] flex items-center justify-center font-black text-xl border border-white/10 group-hover:border-purple-500/50 transition-colors text-white shadow-lg">
                                                         {drive.companyName?.[0] || 'C'}
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-bold text-white group-hover:text-purple-400 transition-colors">{drive.companyName}</h4>
-                                                        <p className="text-xs text-white/50">{drive.role} • {drive.location}</p>
+                                                        <h4 className="font-black text-lg text-white group-hover:text-purple-400 transition-colors tracking-tight">{drive.companyName}</h4>
+                                                        <div className="flex items-center gap-2 text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">
+                                                            <span>{drive.role}</span>
+                                                            <span className="w-1 h-1 bg-white/20 rounded-full"></span>
+                                                            <span>{drive.location}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-sm font-bold text-white">{drive.packageValue}</div>
-                                                    <div className="text-xs text-white/40">{new Date(drive.deadline).toLocaleDateString()}</div>
+                                                    <div className="text-lg font-black text-white tracking-tighter">{drive.packageValue}</div>
+                                                    <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest mt-1">Deadline: {new Date(drive.deadline).toLocaleDateString()}</div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-[200px] text-center">
-                                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                                            <Briefcase size={24} className="text-white/20" />
+                                        <div className="w-20 h-20 bg-white/5 rounded-[24px] flex items-center justify-center mb-6 border border-white/5">
+                                            <Briefcase size={32} className="text-white/10" />
                                         </div>
-                                        <h4 className="text-white/50 font-medium">No Upcoming Drives</h4>
-                                        <p className="text-white/30 text-sm mt-1">Check back later for new opportunities.</p>
+                                        <h4 className="text-white/50 font-black text-lg">No Upcoming Drives</h4>
+                                        <p className="text-white/20 text-sm mt-1 font-medium">Opportunities will appear here soon.</p>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Recent Activity Feed */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                    <Clock size={20} className="text-blue-400" />
+                            <div className="bg-[#12121a] backdrop-blur-xl border border-white/5 rounded-[40px] p-8 shadow-2xl">
+                                <h3 className="text-xl font-black mb-8 flex items-center gap-3 tracking-tighter">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                        <Clock size={20} className="text-blue-400" />
+                                    </div>
                                     Recent Activity
                                 </h3>
 
                                 <div className="space-y-6 relative ml-2">
-                                    {/* Timeline Line */}
-                                    <div className="absolute left-[19px] top-2 bottom-2 w-[2px] bg-white/5"></div>
+                                    <div className="absolute left-[20px] top-2 bottom-2 w-[1px] bg-white/5"></div>
 
                                     {notifications.length > 0 ? notifications.slice(0, 4).map((n, i) => (
-                                        <div key={i} className="relative flex gap-6 group">
-                                            {/* Timeline Dot */}
-                                            <div className="w-10 h-10 rounded-full bg-[#0a0a0f] border-2 border-white/10 group-hover:border-blue-500 flex items-center justify-center z-10 transition-colors">
-                                                {n.type === 'ALERT' ? <Bell size={14} className="text-orange-400" /> : <FileText size={14} className="text-blue-400" />}
+                                        <div key={i} className="relative flex gap-8 group">
+                                            <div className="w-10 h-10 rounded-2xl bg-[#0a0a0f] border border-white/10 group-hover:border-blue-500/50 flex items-center justify-center z-10 transition-all shadow-lg group-hover:scale-110">
+                                                {n.type === 'ALERT' ? <Bell size={14} className="text-yellow-500" /> : <FileText size={14} className="text-blue-500" />}
                                             </div>
 
-                                            <div className="flex-1 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all">
-                                                <p className="text-sm font-medium text-white/90">{n.message}</p>
-                                                <p className="text-xs text-white/40 mt-1">{new Date(n.createdAt || Date.now()).toLocaleString()}</p>
+                                            <div className="flex-1 p-5 bg-white/[0.02] rounded-[24px] border border-white/5 group-hover:bg-white/[0.05] transition-all">
+                                                <p className="text-sm font-bold text-white/80 leading-relaxed">{n.message}</p>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mt-2">{new Date(n.createdAt || Date.now()).toLocaleString()}</p>
                                             </div>
                                         </div>
                                     )) : (
-                                        <div className="text-center py-8 text-white/30 text-sm">No recent activity</div>
+                                        <div className="text-center py-8 text-white/20 text-sm font-medium italic">No recent activity detected.</div>
                                     )}
                                 </div>
                             </div>
@@ -316,99 +330,59 @@ const Dashboard: React.FC = () => {
                         {/* Right Column (4 cols) */}
                         <div className="lg:col-span-4 space-y-6">
 
-                            {/* Profile Strength */}
-                            <div className="bg-gradient-to-br from-purple-900/10 to-blue-900/10 backdrop-blur-xl border border-white/10 rounded-3xl p-6 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px]"></div>
-                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 relative z-10">
-                                    <Star size={18} className="text-yellow-400" />
+                            <div className="bg-[#12121a] backdrop-blur-xl border border-white/5 rounded-[40px] p-8 relative overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px] -mr-16 -mt-16"></div>
+                                <h3 className="text-xl font-black mb-6 flex items-center gap-3 tracking-tighter relative z-10">
+                                    <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center">
+                                        <Star size={18} className="text-yellow-400" />
+                                    </div>
                                     Profile Strength
                                 </h3>
 
-                                <div className="relative pt-2 mb-4 z-10">
-                                    <div className="flex justify-between text-sm mb-2 font-bold">
-                                        <span className="text-white/80">{profileCompleteness < 100 ? 'Almost there!' : 'Excellent!'}</span>
-                                        <span className="text-purple-400">{profileCompleteness}%</span>
+                                <div className="relative mb-8 z-10">
+                                    <div className="flex justify-between items-end mb-4">
+                                        <span className="text-white font-black text-lg tracking-tight">{profileCompleteness < 100 ? 'Almost there!' : 'Excellent!'}</span>
+                                        <span className="text-2xl font-black text-purple-400 tracking-tighter">{profileCompleteness}%</span>
                                     </div>
-                                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-1000"
-                                            style={{ width: `${profileCompleteness}%` }}
-                                        ></div>
+                                    <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${profileCompleteness}%` }}
+                                            transition={{ duration: 1.5, ease: "easeOut" }}
+                                            className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full"
+                                        ></motion.div>
                                     </div>
                                 </div>
 
                                 {profileCompleteness < 100 && (
                                     <button
                                         onClick={() => navigate('/profile')}
-                                        className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-semibold transition-all relative z-10"
+                                        className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-[20px] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative z-10 active:scale-95"
                                     >
                                         Complete Profile
                                     </button>
                                 )}
                             </div>
 
-                            {/* Placement Eligibility (Detailed) */}
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
-                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                    <CheckCircle size={18} className="text-green-400" />
+                            <div className="bg-[#12121a] backdrop-blur-xl border border-white/5 rounded-[40px] p-8 shadow-2xl">
+                                <h3 className="text-xl font-black mb-8 flex items-center gap-3 tracking-tighter">
+                                    <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                        <CheckCircle size={18} className="text-green-400" />
+                                    </div>
                                     Eligibility Status
                                 </h3>
 
                                 <div className="space-y-4">
-                                    {/* CGPA */}
-                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                                                <TrendingUp size={16} />
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-white">CGPA</div>
-                                                <div className="text-[10px] text-white/40">Min 6.0 Required</div>
-                                            </div>
-                                        </div>
-                                        <div className={`text-sm font-bold ${(user?.cgpa || 0) >= 6.0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {user?.cgpa || 'N/A'}
-                                        </div>
-                                    </div>
-
-                                    {/* Backlogs */}
-                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-red-500/20 rounded-lg text-red-400">
-                                                <XCircle size={16} />
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-white">Active Backlogs</div>
-                                                <div className="text-[10px] text-white/40">Must be 0</div>
-                                            </div>
-                                        </div>
-                                        <div className={`text-sm font-bold ${(user?.backlogs || 0) === 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {user?.backlogs || 0}
-                                        </div>
-                                    </div>
-
-                                    {/* Attendance */}
-                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-yellow-500/20 rounded-lg text-yellow-400">
-                                                <Clock size={16} />
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-white">Attendance</div>
-                                                <div className="text-[10px] text-white/40">Min 75% Required</div>
-                                            </div>
-                                        </div>
-                                        <div className={`text-sm font-bold ${(user?.attendance || 0) >= 75 ? 'text-green-400' : 'text-orange-400'}`}>
-                                            {user?.attendance || 0}%
-                                        </div>
-                                    </div>
+                                    <EligibilityItem icon={<TrendingUp size={16} />} label="CGPA" target="6.0 Required" value={user?.cgpa || 'N/A'} isEligible={(user?.cgpa || 0) >= 6.0} color="blue" />
+                                    <EligibilityItem icon={<XCircle size={16} />} label="Active Backlogs" target="Must be 0" value={user?.backlogs || 0} isEligible={(user?.backlogs || 0) === 0} color="red" />
+                                    <EligibilityItem icon={<Clock size={16} />} label="Attendance" target="75% Required" value={`${user?.attendance || 0}%`} isEligible={(user?.attendance || 0) >= 75} color="yellow" />
                                 </div>
 
-                                <div className="mt-4 pt-4 border-t border-white/10 text-center">
-                                    <p className="text-xs text-white/50">
+                                <div className="mt-8 pt-6 border-t border-white/5 text-center">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]">
                                         {((user?.cgpa || 0) >= 6.0 && (user?.backlogs || 0) === 0 && (user?.attendance || 0) >= 75)
-                                            ? <span className="text-green-400 font-bold">You are eligible for placements! 🎉</span>
-                                            : <span className="text-orange-400 font-bold">Review criteria to improve eligibility.</span>
+                                            ? <span className="text-green-400">Placements Eligible 🎉</span>
+                                            : <span className="text-orange-400 italic">Not Yet Eligible</span>
                                         }
                                     </p>
                                 </div>
@@ -432,6 +406,32 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </main>
+        </div>
+    );
+};
+
+const EligibilityItem = ({ icon, label, target, value, isEligible, color }: any) => {
+    const colorMap: any = {
+        blue: 'text-blue-400 bg-blue-500/10 border-blue-500/10',
+        red: 'text-red-400 bg-red-500/10 border-red-500/10',
+        yellow: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/10',
+        green: 'text-green-400 bg-green-500/10 border-green-500/10'
+    };
+
+    return (
+        <div className="flex items-center justify-between p-5 bg-white/[0.02] rounded-[24px] border border-white/5 hover:bg-white/[0.05] transition-all group">
+            <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-xl ${colorMap[color]} group-hover:scale-110 transition-transform`}>
+                    {icon}
+                </div>
+                <div>
+                    <div className="text-sm font-black text-white tracking-tight">{label}</div>
+                    <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">{target}</div>
+                </div>
+            </div>
+            <div className={`text-lg font-black tracking-tighter ${isEligible ? 'text-green-400' : 'text-red-400'}`}>
+                {value}
+            </div>
         </div>
     );
 };

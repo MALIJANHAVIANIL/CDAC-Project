@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Zap, BarChart, GraduationCap, Users, TrendingUp, Bell, CheckCircle, ArrowRight, Play } from 'lucide-react';
 
-import logo from '../assets/logo.png';
+const logo = "/logo.png";
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();

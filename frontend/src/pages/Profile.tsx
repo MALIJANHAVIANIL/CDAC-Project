@@ -6,16 +6,17 @@ import { updateProfile } from '../services/profileService';
 import Sidebar from '../components/layout/Sidebar';
 import {
     User,
+    CheckCircle,
     Mail,
     Briefcase,
     GraduationCap,
     FileText,
+    Trash2,
     Save,
     X,
     Edit3,
     ArrowLeft,
     Upload,
-    CheckCircle,
     AlertCircle,
     Building2,
     Calendar,
@@ -40,6 +41,8 @@ const Profile: React.FC = () => {
         twelfthMarks: ''
     });
     const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const showNotification = (message: string, type: 'success' | 'error') => {
         setNotification({ message, type });
@@ -68,7 +71,15 @@ const Profile: React.FC = () => {
 
     const handleSave = async () => {
         try {
-            const updatedUser = await updateProfile(formData);
+            // Sanitize data: Convert empty strings to null for numeric fields
+            const payload: any = { ...formData };
+            if (payload.cgpa === '') payload.cgpa = null;
+            if (payload.backlogs === '') payload.backlogs = null;
+            if (payload.attendance === '') payload.attendance = null;
+            if (payload.tenthMarks === '') payload.tenthMarks = null;
+            if (payload.twelfthMarks === '') payload.twelfthMarks = null;
+
+            const updatedUser = await updateProfile(payload);
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
             const token = localStorage.getItem('token');
             const newUser = { ...currentUser, ...updatedUser, token };
@@ -96,6 +107,31 @@ const Profile: React.FC = () => {
                 console.error('Resume upload failed', error);
                 showNotification('Resume upload failed', 'error');
             }
+        }
+    };
+
+    const handleDeleteResume = () => {
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            const { deleteResume } = await import('../services/profileService');
+            await deleteResume();
+            showNotification('Resume deleted successfully! 🗑️', 'success');
+
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            delete currentUser.resumeUrl;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+
+            setShowDeleteModal(false);
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            console.error('Failed to delete resume', error);
+            showNotification('Failed to delete resume', 'error');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -207,11 +243,8 @@ const Profile: React.FC = () => {
                                         <ProfileField
                                             icon={<GraduationCap size={16} />}
                                             label="Student ID"
-                                            name="studentId"
-                                            value={formData.studentId}
-                                            onChange={handleChange}
-                                            isEditing={isEditing}
-                                            placeholder="Enter ID"
+                                            value={formData.studentId || 'Not Assigned'}
+                                            disabled={true}
                                         />
                                         <ProfileField
                                             icon={<Building2 size={16} />}
@@ -303,10 +336,39 @@ const Profile: React.FC = () => {
                                 {user?.role === 'STUDENT' ? (
                                     <div className="space-y-4">
                                         <p className="text-xs text-white/50 font-medium">Keep your resume updated for the best placement opportunities.</p>
+
+                                        {user?.resumeUrl && (
+                                            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                                    <CheckCircle size={14} className="text-green-400" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-bold text-green-400">Resume Uploaded</p>
+                                                    <a
+                                                        href={user.resumeUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-[10px] text-white/60 hover:text-white underline block truncate"
+                                                    >
+                                                        View Current Resume
+                                                    </a>
+                                                </div>
+                                                <button
+                                                    onClick={handleDeleteResume}
+                                                    className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-red-500/10"
+                                                    title="Remove Resume"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        )}
+
                                         <label className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl flex items-center justify-center gap-3 cursor-pointer transition-all group overflow-hidden relative">
                                             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                             <Upload size={18} className="text-purple-400 group-hover:scale-110 transition-transform" />
-                                            <span className="text-xs font-black uppercase tracking-widest">Upload Resume</span>
+                                            <span className="text-xs font-black uppercase tracking-widest">
+                                                {user?.resumeUrl ? 'Update Resume' : 'Upload Resume'}
+                                            </span>
                                             <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} />
                                         </label>
                                     </div>
@@ -388,6 +450,64 @@ const Profile: React.FC = () => {
                             </div>
                             {notification.message}
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Delete Confirmation Modal */}
+                <AnimatePresence>
+                    {showDeleteModal && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => !isDeleting && setShowDeleteModal(false)}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                            />
+
+                            {/* Modal Content */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="bg-[#12121a] border border-white/10 rounded-[40px] p-10 max-w-sm w-full relative overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]"
+                            >
+                                {/* Decorative background */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-[60px] rounded-full -mr-16 -mt-16"></div>
+
+                                <div className="relative z-10 flex flex-col items-center text-center">
+                                    <div className="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center mb-8 border border-red-500/10">
+                                        <Trash2 size={36} className="text-red-500" />
+                                    </div>
+                                    <h3 className="text-2xl font-black mb-3 tracking-tighter text-white">Delete Resume?</h3>
+                                    <p className="text-white/40 text-sm mb-10 leading-relaxed font-medium">
+                                        This action cannot be undone. You will need to upload a new resume to remain eligible for placement drives.
+                                    </p>
+
+                                    <div className="flex flex-col w-full gap-4">
+                                        <button
+                                            onClick={confirmDelete}
+                                            disabled={isDeleting}
+                                            className="w-full py-5 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-[24px] shadow-lg shadow-red-500/20 transition-all flex items-center justify-center gap-3 active:scale-95 group"
+                                        >
+                                            {isDeleting ? (
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                <>Proceed Removal <Trash2 size={16} className="group-hover:translate-x-1 transition-transform" /></>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={() => setShowDeleteModal(false)}
+                                            disabled={isDeleting}
+                                            className="w-full py-5 bg-white/5 hover:bg-white/10 text-white/60 font-black uppercase tracking-[0.2em] text-[10px] rounded-[24px] border border-white/5 transition-all active:scale-95"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
             </main>
