@@ -128,6 +128,7 @@ public class DriveController {
                         applicationRepository.flush(); // Ensure they are deleted from DB
                     }
 
+                    java.util.Objects.requireNonNull(drive);
                     driveRepository.delete(drive);
                     return ResponseEntity.ok().build();
                 })

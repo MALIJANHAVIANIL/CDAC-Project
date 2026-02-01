@@ -57,7 +57,7 @@ public class QuestionController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
         Long userId = user.getId();
 
-        return questionRepository.findById(id).map(q -> {
+        return questionRepository.findById(java.util.Objects.requireNonNull(id)).map(q -> {
             if (q.getUser().getId().equals(userId)) {
                 return ResponseEntity.badRequest().body("You cannot like your own question");
             }
@@ -99,10 +99,10 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
-        if (!questionRepository.existsById(id)) {
+        if (!questionRepository.existsById(java.util.Objects.requireNonNull(id))) {
             return ResponseEntity.notFound().build();
         }
-        questionRepository.deleteById(id);
+        questionRepository.deleteById(java.util.Objects.requireNonNull(id));
         return ResponseEntity.ok().build();
     }
 }

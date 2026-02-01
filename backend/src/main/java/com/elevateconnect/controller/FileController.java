@@ -87,7 +87,7 @@ public class FileController {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(
-                    filePath.toUri());
+                    java.util.Objects.requireNonNull(filePath.toUri()));
 
             if (resource.exists()) {
                 String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());

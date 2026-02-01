@@ -46,7 +46,7 @@ public class TPOController {
 
     @PutMapping("/drives/{id}/approve")
     public ResponseEntity<?> approveDrive(@PathVariable Long id) {
-        PlacementDrive drive = driveRepository.findById(id)
+        PlacementDrive drive = driveRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Drive not found"));
 
         // Get current TPO user
@@ -68,7 +68,7 @@ public class TPOController {
 
     @PutMapping("/drives/{id}/reject")
     public ResponseEntity<?> rejectDrive(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        PlacementDrive drive = driveRepository.findById(id)
+        PlacementDrive drive = driveRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Drive not found"));
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -104,12 +104,12 @@ public class TPOController {
 
     @GetMapping("/students/{id}")
     public ResponseEntity<?> getStudentDetails(@PathVariable Long id) {
-        User student = userRepository.findById(id)
+        User student = userRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         Map<String, Object> details = new HashMap<>();
         details.put("student", student);
-        details.put("applications", applicationRepository.findByUserId(id));
+        details.put("applications", applicationRepository.findByUserId(java.util.Objects.requireNonNull(id)));
         details.put("assignedCourses", student.getAssignedCourses());
 
         return ResponseEntity.ok(details);
@@ -118,7 +118,7 @@ public class TPOController {
     @PutMapping("/students/{id}/ban")
     public ResponseEntity<?> banStudent(@PathVariable Long id,
             @RequestBody(required = false) Map<String, String> body) {
-        User student = userRepository.findById(id)
+        User student = userRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         student.setAccountStatus(AccountStatus.BANNED);
@@ -129,7 +129,7 @@ public class TPOController {
 
     @PutMapping("/students/{id}/activate")
     public ResponseEntity<?> activateStudent(@PathVariable Long id) {
-        User student = userRepository.findById(id)
+        User student = userRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         student.setAccountStatus(AccountStatus.ACTIVE);
@@ -161,7 +161,7 @@ public class TPOController {
 
     @PutMapping("/courses/{id}")
     public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody Course courseUpdate) {
-        Course course = courseRepository.findById(id)
+        Course course = courseRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
         course.setName(courseUpdate.getName());
@@ -175,15 +175,15 @@ public class TPOController {
 
     @DeleteMapping("/courses/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
-        courseRepository.deleteById(id);
+        courseRepository.deleteById(java.util.Objects.requireNonNull(id));
         return ResponseEntity.ok(new MessageResponse("Course deleted successfully!"));
     }
 
     @PostMapping("/courses/{courseId}/assign/{studentId}")
     public ResponseEntity<?> assignCourse(@PathVariable Long courseId, @PathVariable Long studentId) {
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findById(java.util.Objects.requireNonNull(courseId))
                 .orElseThrow(() -> new RuntimeException("Course not found"));
-        User student = userRepository.findById(studentId)
+        User student = userRepository.findById(java.util.Objects.requireNonNull(studentId))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         student.getAssignedCourses().add(course);
@@ -194,9 +194,9 @@ public class TPOController {
 
     @DeleteMapping("/courses/{courseId}/unassign/{studentId}")
     public ResponseEntity<?> unassignCourse(@PathVariable Long courseId, @PathVariable Long studentId) {
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findById(java.util.Objects.requireNonNull(courseId))
                 .orElseThrow(() -> new RuntimeException("Course not found"));
-        User student = userRepository.findById(studentId)
+        User student = userRepository.findById(java.util.Objects.requireNonNull(studentId))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         student.getAssignedCourses().remove(course);

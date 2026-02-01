@@ -5,6 +5,7 @@ import com.elevateconnect.model.Role;
 import com.elevateconnect.model.User;
 import com.elevateconnect.dto.ChatRequest;
 import com.elevateconnect.dto.ChatPartnerDTO;
+import com.elevateconnect.dto.MessageResponse;
 
 import com.elevateconnect.repository.ChatRepository;
 import com.elevateconnect.repository.UserRepository;
@@ -111,9 +112,11 @@ public class ChatController {
         // For "Recent", strictly return history partners.
 
         List<ChatPartnerDTO> recentPartners = lastActive.keySet().stream()
-                .map(id -> userRepository.findById(id).orElse(null))
-                .filter(u -> u != null)
-                .map(u -> new ChatPartnerDTO(u.getId(), u.getName(), u.getEmail(), u.getRole().name(), ""))
+                .filter(java.util.Objects::nonNull)
+                .map(id -> userRepository.findById(java.util.Objects.requireNonNull(id)).orElse(null))
+                .filter(java.util.Objects::nonNull)
+                .map(u -> new ChatPartnerDTO(java.util.Objects.requireNonNull(u.getId()), u.getName(), u.getEmail(),
+                        u.getRole().name(), ""))
                 .collect(Collectors.toList());
 
         // Sort by recency
@@ -127,7 +130,10 @@ public class ChatController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User sender = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
-        User receiver = userRepository.findById(chatRequest.getReceiverId())
+        if (chatRequest.getReceiverId() == null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Receiver ID is required"));
+        }
+        User receiver = userRepository.findById(java.util.Objects.requireNonNull(chatRequest.getReceiverId()))
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
         Chat chat = new Chat();

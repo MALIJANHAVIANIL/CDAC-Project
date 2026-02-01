@@ -34,7 +34,7 @@ public class NotificationController {
 
     @PutMapping("/{id}/read")
     public ResponseEntity<?> markAsRead(@PathVariable Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow();
+        Notification notification = notificationRepository.findById(java.util.Objects.requireNonNull(id)).orElseThrow();
         notification.setRead(true);
         notificationRepository.save(notification);
         return ResponseEntity.ok().build();
